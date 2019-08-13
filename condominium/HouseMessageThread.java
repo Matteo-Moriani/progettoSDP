@@ -29,12 +29,17 @@ public class HouseMessageThread extends Thread{
             String method = input[1];
             switch (method){
                 case "introduce":
-                    House h = gson.fromJson(input[0], House.class);
-                    house.AddHouse(h);
+                    House newHouse = gson.fromJson(input[0], House.class);
+                    house.AddHouse(newHouse);
                     break;
                 case "quit":
-                    int id = gson.fromJson(input[0], int.class);
-                    house.RemoveHouse(id);
+                    int quittingID = gson.fromJson(input[0], int.class);
+                    house.RemoveHouse(quittingID);
+                    break;
+                case "new-stat":
+                    House sendingStatHouse = gson.fromJson(input[0], House.class);
+                    System.out.println("sending "+sendingStatHouse.getID()+" last stat to " + house.getID());
+                    house.NewStatFromHouse(sendingStatHouse);
                     break;
 //                case SetAdmin:
 //                    house.SetAdmin(gson.fromJson(mex.json, int.class));

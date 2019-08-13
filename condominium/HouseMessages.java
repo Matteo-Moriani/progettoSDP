@@ -12,6 +12,7 @@ public class HouseMessages {
     Gson gson;
     private final String INTRODUCE_METHOD = "introduce";
     private final String QUIT_METHOD = "quit";
+    private final String NEW_STAT_METHOD = "new-stat";
     private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
 
     public HouseMessages(){
@@ -26,10 +27,19 @@ public class HouseMessages {
         socket.close();
     }
 
-    public void Quit(House target, int quittinHouseID) throws IOException{
+    public void Quit(House target, int quittingHouseID) throws IOException{
         Socket socket = new Socket("localhost", target.getPort());
         DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-        String message = gson.toJson(quittinHouseID)+SPLIT+QUIT_METHOD;
+        String message = gson.toJson(quittingHouseID)+SPLIT+QUIT_METHOD;
+        outToTarget.writeBytes(message);
+        socket.close();
+    }
+
+    public void SendNewStat(House target, House sendingStatHouse) throws IOException{
+        Socket socket = new Socket("localhost", target.getPort());
+        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+        String message = gson.toJson(sendingStatHouse)+SPLIT+NEW_STAT_METHOD;
+        System.out.println("sending "+message+" from "+sendingStatHouse.getID()+" to "+target.getID());
         outToTarget.writeBytes(message);
         socket.close();
     }

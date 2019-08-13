@@ -2,11 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="060db36a-c8d7-493d-927c-5343f04a1aec" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/condominium/House.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/House.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/condominium/HouseBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/HouseBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/condominium/HouseMessageThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/HouseMessageThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/condominium/HouseMessages.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/HouseMessages.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/META-INF/progettoSDP.kotlin_module" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/condominium/House.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/condominium/House.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/condominium/HouseBuffer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/condominium/HouseBuffer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/services/HelloWorld.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/HelloWorld.java" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,43 +25,24 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/condominium/AdminClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="36" column="55" selection-start-line="36" selection-start-column="55" selection-end-line="36" selection-end-column="55" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/condominium/House.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="248">
-              <caret line="149" column="25" lean-forward="true" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
+            <state relative-caret-position="206">
+              <caret line="82" column="61" selection-start-line="82" selection-start-column="61" selection-end-line="82" selection-end-column="61" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2767#2768#0" expanded="true" />
+                <element signature="e#2798#2799#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/condominium/ServerREST.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="82" column="49" selection-start-line="82" selection-start-column="49" selection-end-line="82" selection-end-column="49" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/condominium/ServerMessages.java">
+        <entry file="file://$PROJECT_DIR$/condominium/HouseBuffer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="952">
-              <caret line="68" column="62" selection-start-line="68" selection-start-column="62" selection-end-line="68" selection-end-column="62" />
+            <state relative-caret-position="325">
+              <caret line="39" column="50" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -68,8 +53,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/condominium/HouseMessages.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="23" column="70" selection-start-line="23" selection-start-column="70" selection-end-line="23" selection-end-column="70" />
+            <state relative-caret-position="332">
+              <caret line="42" column="40" lean-forward="true" selection-start-line="42" selection-start-column="40" selection-end-line="42" selection-end-column="40" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -77,23 +62,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/condominium/HouseSocket.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="21" column="30" selection-start-line="21" selection-start-column="30" selection-end-line="21" selection-end-column="30" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/condominium/HouseMessageThread.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="28" column="37" selection-start-line="28" selection-start-column="37" selection-end-line="28" selection-end-column="37" />
+            <state relative-caret-position="106">
+              <caret line="40" column="109" selection-start-line="40" selection-start-column="109" selection-end-line="40" selection-end-column="109" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -135,6 +108,8 @@
       <find>choose</find>
       <find>introducing</find>
       <find>quit()</find>
+      <find>newstat</find>
+      <find>mean</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -159,7 +134,6 @@
         <option value="$PROJECT_DIR$/condominium/Services.java" />
         <option value="$PROJECT_DIR$/simulation_src_2019/SmartMeterSimulator.java" />
         <option value="$PROJECT_DIR$/condominium/Houses.java" />
-        <option value="$PROJECT_DIR$/condominium/HouseBuffer.java" />
         <option value="$PROJECT_DIR$/condominium/Requests.java" />
         <option value="$PROJECT_DIR$/ServerREST.java" />
         <option value="$PROJECT_DIR$/condominium/SocketThread.java" />
@@ -167,19 +141,24 @@
         <option value="$PROJECT_DIR$/condominium/ServerMessages.java" />
         <option value="$PROJECT_DIR$/condominium/HouseSocketThread.java" />
         <option value="$PROJECT_DIR$/condominium/HouseSocket.java" />
-        <option value="$PROJECT_DIR$/condominium/HouseMessages.java" />
-        <option value="$PROJECT_DIR$/condominium/HouseMessageThread.java" />
         <option value="$PROJECT_DIR$/condominium/HelloWorld.java" />
         <option value="$PROJECT_DIR$/condominium/AdminClient.java" />
         <option value="$PROJECT_DIR$/condominium/ServerREST.java" />
+        <option value="$PROJECT_DIR$/condominium/Stat.java" />
+        <option value="$PROJECT_DIR$/condominium/HouseBuffer.java" />
         <option value="$PROJECT_DIR$/condominium/House.java" />
+        <option value="$PROJECT_DIR$/condominium/HouseMessages.java" />
+        <option value="$PROJECT_DIR$/condominium/HouseMessageThread.java" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="676" />
     <option name="width" value="697" />
     <option name="height" value="735" />
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -187,6 +166,7 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -207,11 +187,6 @@
             <path>
               <item name="progettoSDP" type="b2602c69:ProjectViewProjectNode" />
               <item name="progettoSDP" type="462c0819:PsiDirectoryNode" />
-              <item name="services" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="progettoSDP" type="b2602c69:ProjectViewProjectNode" />
-              <item name="progettoSDP" type="462c0819:PsiDirectoryNode" />
               <item name="simulation_src_2019" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -222,7 +197,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -233,7 +207,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/OneDrive/Università/Sistemi distribuiti e pervasivi/SDP/progettoDavide" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Libraries" />
@@ -323,8 +297,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.House" />
-        <item itemvalue="Application.AdminClient" />
         <item itemvalue="Application.ServerREST" />
+        <item itemvalue="Application.AdminClient" />
         <item itemvalue="Application.HelloWorld" />
       </list>
     </recent_temporary>
@@ -360,16 +334,18 @@
       <workItem from="1565685455720" duration="355000" />
       <workItem from="1565686405945" duration="379000" />
       <workItem from="1565687215189" duration="136000" />
+      <workItem from="1565687388716" duration="7764000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="103305000" />
+    <option name="totallyTimeSpent" value="111069000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4976415" visible="true" weight="0.13464448" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4976415" visible="true" weight="0.13615733" />
       <window_info id="Structure" order="1" sideWeight="0.5023585" side_tool="true" weight="0.1172466" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -378,7 +354,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.48608837" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.6202946" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -428,13 +404,6 @@
     <entry file="file://$PROJECT_DIR$/.idea/libraries/lib1.xml" />
     <entry file="file://$PROJECT_DIR$/.idea/libraries/libraries.xml" />
     <entry file="file://$PROJECT_DIR$/../Lesson2/Lesson2.iml" />
-    <entry file="file://$PROJECT_DIR$/services/HelloWorld.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_45/src.zip!/java/lang/Thread.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="529">
@@ -446,13 +415,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/simulation_src_2019/Measurement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="55" column="19" lean-forward="true" selection-start-line="55" selection-start-column="19" selection-end-line="55" selection-end-column="19" />
         </state>
       </provider>
     </entry>
@@ -484,16 +446,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/HouseBuffer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/condominium/Houses.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
@@ -505,6 +457,12 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/condominium/HelloWorld.java" />
+    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/condominium/AdminClient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
@@ -525,16 +483,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/HouseMessages.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="23" column="70" selection-start-line="23" selection-start-column="70" selection-end-line="23" selection-end-column="70" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/condominium/HouseSocket.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -545,36 +493,83 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/HouseMessageThread.java">
+    <entry file="file://$PROJECT_DIR$/services/HelloWorld.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="28" column="37" selection-start-line="28" selection-start-column="37" selection-end-line="28" selection-end-column="37" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="221">
+          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/House.java">
+    <entry file="file://$PROJECT_DIR$/simulation_src_2019/Measurement.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="149" column="25" lean-forward="true" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="663">
+          <caret line="55" column="19" selection-start-line="55" selection-start-column="19" selection-end-line="55" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/condominium/ServerREST.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
+        <state relative-caret-position="343">
           <caret line="82" column="49" selection-start-line="82" selection-start-column="49" selection-end-line="82" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/Stat.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+          <folding>
+            <element signature="e#245#246#0" expanded="true" />
+            <element signature="e#277#278#0" expanded="true" />
+            <element signature="e#324#325#0" expanded="true" />
+            <element signature="e#366#367#0" expanded="true" />
+            <element signature="e#396#397#0" expanded="true" />
+            <element signature="e#423#424#0" expanded="true" />
+            <element signature="e#462#463#0" expanded="true" />
+            <element signature="e#494#495#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/HouseBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="39" column="50" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/House.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="82" column="61" selection-start-line="82" selection-start-column="61" selection-end-line="82" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2767#2768#0" expanded="true" />
+            <element signature="e#2798#2799#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/HouseMessages.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="42" column="40" lean-forward="true" selection-start-line="42" selection-start-column="40" selection-end-line="42" selection-end-column="40" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/HouseMessageThread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="106">
+          <caret line="40" column="109" selection-start-line="40" selection-start-column="109" selection-end-line="40" selection-end-column="109" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

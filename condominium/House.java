@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -19,12 +20,14 @@ public class House {
     @Expose
     private int port;
     private static String serverIP;
-    private static List<House> houseList;
+    private static List<House> condominiumHouses;
     private static HouseBuffer buffer;
     private static ServerMessages serverMessages;
     private static HouseMessages houseMessages;
     private static HouseSocket houseSocket;
     private static SmartMeterSimulator smartMeter;
+    private Stat lastStat;
+    private List<House> HousesSendingStat = new ArrayList<>();
 
     Gson gson;
 
@@ -35,7 +38,7 @@ public class House {
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         serverMessages = new ServerMessages();
         houseMessages = new HouseMessages();
-        buffer = new HouseBuffer();
+        buffer = new HouseBuffer(this);
 
         System.out.println("\nHOUSE "+id+" (port "+port+")");
 
@@ -46,11 +49,11 @@ public class House {
 
         // 2 - mi registro nel condominio e ricevo la lista di case
         register();
-        houseList = serverMessages.askHouseList(serverIP);
+        condominiumHouses = serverMessages.askHouseList(serverIP);
         printHouseList();
 
         // 3 - mi presento a tutte le altre case
-        for(House h : houseList){
+        for(House h : condominiumHouses){
             if(h.getID() != id) {
                 System.out.println("introducing to house " + h.getID());
                 houseMessages.IntroduceTo(h.getPort(), this);
@@ -72,19 +75,37 @@ public class House {
         return port;
     }
 
-//    void introduceTo(House h) throws IOException{
-//
-//        Socket s = new Socket("localhost", h.getPort());
-//        DataOutputStream out = new DataOutputStream(s.getOutputStream());
-//
-//        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-//        String jsonToHouse = gson.toJson(this);
-//        out.writeBytes(jsonToHouse);
-//        out.flush();
-//        out.close();
-//
-//        s.close();
-//    }
+    public void setLastStat(Stat lastStat) throws IOException{
+        this.lastStat = lastStat;
+        System.out.println("mean produced: "+lastStat.getMean()+" ("+lastStat.getTimestamp()+")");
+        for(House h: condominiumHouses) {
+            houseMessages.SendNewStat(h, this);
+            System.out.println("sending "+id+" to "+h.getID());
+        }
+    }
+
+    public Stat getLastStat(){
+        return lastStat;
+    }
+
+    public void NewStatFromHouse(House sendingStat){
+
+        // ogni casa entra una volta sola nella lista
+        if(HousesSendingStat.contains(sendingStat))
+            return;
+        HousesSendingStat.add(sendingStat);
+
+        double sum = 0;
+        for(House h: condominiumHouses){
+            // se una casa del condominio non ha ancora mandato la statistica, interrompo qui
+            if(!HousesSendingStat.contains(h))
+                return;
+            else
+                sum = sum + sendingStat.getLastStat().getMean();
+        }
+        // se ogni casa del condominio è in lista allora posso generare il dato finale
+        System.out.println("total consumes: "+sum+" ("+sendingStat.getLastStat().getTimestamp()+")");
+    }
 
     void register() throws IOException{
 
@@ -124,7 +145,7 @@ public class House {
                 case "1":
                     System.out.println("quitting");
                     serverMessages.Leave(serverIP, id);
-                    for(House h:houseList){
+                    for(House h: condominiumHouses){
                         if(h.getID() != id)
                             houseMessages.Quit(h, id);
                     }
@@ -147,13 +168,13 @@ public class House {
     }
 
     public void AddHouse(House h){
-        houseList.add(h);
+        condominiumHouses.add(h);
         System.out.println("\nHouse "+h.getID()+" added to list");
         printHouseList();
     }
 
     public void RemoveHouse(int id) {
-        Iterator<House> iter = houseList.iterator();
+        Iterator<House> iter = condominiumHouses.iterator();
         while(iter.hasNext()){
             House h = iter.next();
             if(h.getID() == id){
@@ -167,7 +188,7 @@ public class House {
 
     public void printHouseList(){
         System.out.println("House list:");
-        for(House h:houseList){
+        for(House h: condominiumHouses){
             System.out.print(h.getID()+" ");
         }
         System.out.print("\n");
