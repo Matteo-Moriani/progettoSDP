@@ -60,14 +60,18 @@ public class AdminClient {
             switch (command[0]) {
                 case "1":
                     System.out.println("house list:");
-                    List<House> houseList = messages.askHouseList(serverIP);
+                    List<House> houseList = messages.AskHouseList(serverIP);
                     for(House h:houseList){
-                        System.out.print(h.getID()+" ");
+                        System.out.print(h.GetID()+" ");
                     }
                     break;
-//                    case "2":
-//                        System.out.println(SendRequest("GET", "/stats/" + cmd[1] + "/" + cmd[2], ""));
-//                        break;
+                case "2":
+                    Stat[] stats = messages.GetHouseStats(serverIP, Integer.parseInt(command[1]), Integer.parseInt(command[2]));
+                    System.out.println("house "+Integer.parseInt(command[2])+" last "+Integer.parseInt((command[1]))+" stats:");
+                    for(int i = 0; i<stats.length; i++) {
+                        System.out.println("    "+(i+1)+": "+stats[i].GetMean()+" ("+stats[i].getTimestamp()+")");
+                    }
+                    break;
 //                    case "3":
 //                        System.out.println(SendRequest("GET", "/stats/" + cmd[1], ""));
 //                        break;
@@ -95,7 +99,7 @@ public class AdminClient {
     @Consumes({"application/json"})
     public Response houseJoined(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        System.out.print("\n      NOTIFICATION: house "+h.getID()+" joined the condominium");
+        System.out.print("\n      NOTIFICATION: house "+h.GetID()+" joined the condominium");
         return Response.ok().build();
     }
 
@@ -104,7 +108,7 @@ public class AdminClient {
     @Consumes({"application/json"})
     public Response houseLeft(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        System.out.print("\n      NOTIFICATION: house "+h.getID()+" left the condominium");
+        System.out.print("\n      NOTIFICATION: house "+h.GetID()+" left the condominium");
         return Response.ok().build();
     }
 
@@ -113,7 +117,7 @@ public class AdminClient {
     @Consumes({"application/json"})
     public Response boostRequest(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        System.out.print("\n      NOTIFICATION: house "+h.getID()+" has requested extra energy");
+        System.out.print("\n      NOTIFICATION: house "+h.GetID()+" has requested extra energy");
         return Response.ok().build();
     }
 }

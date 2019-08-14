@@ -19,7 +19,7 @@ public class HouseSocket extends Thread {
     }
 
     public void run() {
-        System.out.println("\nSocket listening at port " + house.getPort());
+        System.out.println("\nSocket listening at port " + house.GetPort());
         while (!quit) {
             try {
                 Socket messageSocket = socket.accept();

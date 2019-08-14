@@ -62,21 +62,21 @@ public class ServerREST {
     }
 
     //permette di inserire una casa se non ce n'e gia una con lo stesso id
-    @Path("add/house")
+    @Path("addHouse/house")
     @POST
     @Consumes({"application/json"})
     public Response addHouse(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        if(houses.getInstance().idAlreadyPresent(h.getID())) {
-            System.out.println("house "+h.getID()+" already present");
+        if(houses.getInstance().idAlreadyPresent(h.GetID())) {
+            System.out.println("house "+h.GetID()+" already present");
             return Response.serverError().build();                  // scegliere poi l'errore giusto
         }
         else{
-            houses.getInstance().add(h);
-            System.out.println("house "+h.getID()+" added");
+            houses.getInstance().addHouse(h);
+            System.out.println("house "+h.GetID()+" added");
             System.out.println("new list: ");
             for(House i:houses.getInstance().getHouseList()){
-                System.out.print(i.getID()+" ");
+                System.out.print(i.GetID()+" ");
             }
             System.out.print("\n");
             try {
@@ -88,18 +88,18 @@ public class ServerREST {
         }
     }
 
-    @Path("remove/house")
+    @Path("removeHouse/house")
     @DELETE
     @Consumes({"application/json"})
     public Response removeHouse(String jsonHouseID) throws IOException{
         int houseID = gson.fromJson(jsonHouseID, int.class);
         House h = houses.getInstance().getByID(houseID);
         if(h!=null){
-            houses.getInstance().remove(h);
-            System.out.println("house "+h.getID()+" removed");
+            houses.getInstance().removeHouse(h);
+            System.out.println("house "+h.GetID()+" removed");
             System.out.println("new list: ");
             for(House i:houses.getInstance().getHouseList()){
-                System.out.print(i.getID()+" ");
+                System.out.print(i.GetID()+" ");
             }
             System.out.print("\n");
             try {
@@ -113,15 +113,13 @@ public class ServerREST {
             return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    @Path("get/{id}")
+    @Path("get/{n}/{id}")
     @GET
     @Produces({"application/json"})
-    public Response getByID(@PathParam("id") int id){
-        House h = houses.getInstance().getByID(id);
-        if(h!=null)
-            return Response.ok(h).build();
-        else
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response getHouseStats(@PathParam("n") int n, @PathParam("id") int id){
+        Stat[] lastStats = houses.getInstance().getStats(n, id);
+        String jsonStats = gson.toJson(lastStats);
+        return Response.ok(jsonStats).build();
     }
 
     @Path("add/client")
@@ -131,6 +129,16 @@ public class ServerREST {
         String ip = gson.fromJson(jsonClientIP, String.class);
         adminIP = ip;
         System.out.println("client has been initialized (IP "+adminIP+")");
+        return Response.ok().build();
+    }
+
+    @Path("new-stat")
+    @POST
+    @Consumes({"application/json"})
+    public Response newStat(String jsonHouse){
+        House h = gson.fromJson(jsonHouse, House.class);
+        System.out.println("trying to save last stat of "+h.GetID());
+        houses.getInstance().addStat(h,h.GetLastStat());
         return Response.ok().build();
     }
 }

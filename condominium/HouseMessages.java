@@ -28,7 +28,7 @@ public class HouseMessages {
     }
 
     public void Quit(House target, int quittingHouseID) throws IOException{
-        Socket socket = new Socket("localhost", target.getPort());
+        Socket socket = new Socket("localhost", target.GetPort());
         DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
         String message = gson.toJson(quittingHouseID)+SPLIT+QUIT_METHOD;
         outToTarget.writeBytes(message);
@@ -36,10 +36,10 @@ public class HouseMessages {
     }
 
     public void SendNewStat(House target, House sendingStatHouse) throws IOException{
-        Socket socket = new Socket("localhost", target.getPort());
+        Socket socket = new Socket("localhost", target.GetPort());
         DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
         String message = gson.toJson(sendingStatHouse)+SPLIT+NEW_STAT_METHOD;
-        System.out.println("sending "+message+" from "+sendingStatHouse.getID()+" to "+target.getID());
+//        System.out.println("sending "+message+" from "+sendingStatHouse.GetID()+" to "+target.GetID());
         outToTarget.writeBytes(message);
         socket.close();
     }

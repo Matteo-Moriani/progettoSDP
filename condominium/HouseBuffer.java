@@ -21,7 +21,7 @@ public class HouseBuffer implements Buffer {
     }
 
     public void addMeasurement(Measurement measure) {   // poi riguarda come funziona esattamente
-        lastMeasurements.add(measure);                    // add lo mette alla fine
+        lastMeasurements.add(measure);                    // addHouse lo mette alla fine
         counter++;
 
         if (lastMeasurements.size() > WINDOW)
@@ -37,7 +37,7 @@ public class HouseBuffer implements Buffer {
                 lastStat.setMean(mean);
                 lastStat.setTimestamp(measure.getTimestamp());
                 try {
-                    myHouse.setLastStat(lastStat);
+                    myHouse.GetLastStat(lastStat);
                 } catch (IOException e){
                     e.printStackTrace();
                 }

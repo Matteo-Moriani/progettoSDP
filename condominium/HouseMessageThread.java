@@ -38,7 +38,7 @@ public class HouseMessageThread extends Thread{
                     break;
                 case "new-stat":
                     House sendingStatHouse = gson.fromJson(input[0], House.class);
-                    System.out.println("sending "+sendingStatHouse.getID()+" last stat to " + house.getID());
+//                    System.out.println(house.GetID()+" is trying to receive last stat of "+sendingStatHouse.GetID());
                     house.NewStatFromHouse(sendingStatHouse);
                     break;
 //                case SetAdmin:

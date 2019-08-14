@@ -1,7 +1,11 @@
 package condominium;
 
+import com.google.gson.annotations.Expose;
+
 public class Stat {
+    @Expose
     private double mean;
+    @Expose
     private long timestamp;
 
     public Stat(double mean, long timestamp){
@@ -15,7 +19,7 @@ public class Stat {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-    public double getMean() {
+    public double GetMean() {
         return mean;
     }
     public void setMean(double mean) {

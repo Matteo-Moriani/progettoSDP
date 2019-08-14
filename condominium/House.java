@@ -19,6 +19,8 @@ public class House {
     private int id;
     @Expose
     private int port;
+    @Expose
+    private Stat lastStat;
     private static String serverIP;
     private static List<House> condominiumHouses;
     private static HouseBuffer buffer;
@@ -26,8 +28,7 @@ public class House {
     private static HouseMessages houseMessages;
     private static HouseSocket houseSocket;
     private static SmartMeterSimulator smartMeter;
-    private Stat lastStat;
-    private List<House> HousesSendingStat = new ArrayList<>();
+    private List<House> housesSendingStat = new ArrayList<>();
 
     Gson gson;
 
@@ -48,15 +49,15 @@ public class House {
         System.out.println("smart meter running");
 
         // 2 - mi registro nel condominio e ricevo la lista di case
-        register();
-        condominiumHouses = serverMessages.askHouseList(serverIP);
+        Register();
+        condominiumHouses = serverMessages.AskHouseList(serverIP);
         printHouseList();
 
         // 3 - mi presento a tutte le altre case
         for(House h : condominiumHouses){
-            if(h.getID() != id) {
-                System.out.println("introducing to house " + h.getID());
-                houseMessages.IntroduceTo(h.getPort(), this);
+            if(h.GetID() != id) {
+                System.out.println("introducing to house " + h.GetID());
+                houseMessages.IntroduceTo(h.GetPort(), this);
             }
         }
         System.out.print("finished introducing to the condominium");
@@ -67,49 +68,63 @@ public class House {
 
     }
 
-    public int getID() {
+    public int GetID() {
         return id;
     }
 
-    public int getPort() {
+    public int GetPort() {
         return port;
     }
 
-    public void setLastStat(Stat lastStat) throws IOException{
+    public void GetLastStat(Stat lastStat) throws IOException{
         this.lastStat = lastStat;
-        System.out.println("mean produced: "+lastStat.getMean()+" ("+lastStat.getTimestamp()+")");
+        System.out.println("+++ mean produced: "+lastStat.GetMean()+" ("+lastStat.getTimestamp()+") +++");
         for(House h: condominiumHouses) {
+//            System.out.println("sending "+id+" to "+h.GetID());
             houseMessages.SendNewStat(h, this);
-            System.out.println("sending "+id+" to "+h.getID());
         }
+        serverMessages.SendNewStat(serverIP, this);
     }
 
-    public Stat getLastStat(){
+    public Stat GetLastStat(){
         return lastStat;
     }
 
-    public void NewStatFromHouse(House sendingStat){
-
-        // ogni casa entra una volta sola nella lista
-        if(HousesSendingStat.contains(sendingStat))
-            return;
-        HousesSendingStat.add(sendingStat);
-
-        double sum = 0;
-        for(House h: condominiumHouses){
-            // se una casa del condominio non ha ancora mandato la statistica, interrompo qui
-            if(!HousesSendingStat.contains(h))
-                return;
-            else
-                sum = sum + sendingStat.getLastStat().getMean();
+    public synchronized void NewStatFromHouse(House sendingStat){
+        // se c'e' gia' la casa in questione, la sostituisco dalla lista mettendo la sua versione piu recente
+        for(House h:housesSendingStat){
+            if(h.GetID() == sendingStat.GetID()){
+                housesSendingStat.remove(h);
+                break;
+//                System.out.println("old version of "+h.GetID()+" removed");
+            }
         }
-        // se ogni casa del condominio è in lista allora posso generare il dato finale
-        System.out.println("total consumes: "+sum+" ("+sendingStat.getLastStat().getTimestamp()+")");
+        housesSendingStat.add(sendingStat);
+        for(House h: condominiumHouses){
+            boolean matchFound = false;
+            for(House s:housesSendingStat){
+                if(h.GetID() == s.GetID()) {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if(!matchFound){
+//                System.out.println("some house is still missing");
+                return;
+            }
+        }
+        // se arrivo qui vuol dire che ogni casa del condominio è in lista e allora posso generare il dato finale
+        double sum = 0;
+        for(House h:housesSendingStat){
+            sum = sum + h.GetLastStat().GetMean();
+        }
+        System.out.println(">>> total consumes: "+sum+" ("+sendingStat.GetLastStat().getTimestamp()+") <<<\n");
+        housesSendingStat.clear();
     }
 
-    void register() throws IOException{
+    void Register() throws IOException{
 
-        URL url = new URL( serverIP+"/server/add/house");
+        URL url = new URL( serverIP+"/server/addHouse/house");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
@@ -135,7 +150,7 @@ public class House {
             System.out.println("\nCommands available:");
             System.out.println("1: quit");
             System.out.println("2: request boost");
-            System.out.print("choose a command and press return: ");
+            System.out.print("choose a command and press return:\n\n\n");
 
             String input = "";
             input = scanner.nextLine();
@@ -146,7 +161,7 @@ public class House {
                     System.out.println("quitting");
                     serverMessages.Leave(serverIP, id);
                     for(House h: condominiumHouses){
-                        if(h.getID() != id)
+                        if(h.GetID() != id)
                             houseMessages.Quit(h, id);
                     }
                     quit = true;
@@ -169,7 +184,7 @@ public class House {
 
     public void AddHouse(House h){
         condominiumHouses.add(h);
-        System.out.println("\nHouse "+h.getID()+" added to list");
+        System.out.println("\nHouse "+h.GetID()+" added to list");
         printHouseList();
     }
 
@@ -177,9 +192,9 @@ public class House {
         Iterator<House> iter = condominiumHouses.iterator();
         while(iter.hasNext()){
             House h = iter.next();
-            if(h.getID() == id){
+            if(h.GetID() == id){
                 iter.remove();
-                System.out.println("House "+h.getID()+" removed from list");
+                System.out.println("House "+h.GetID()+" removed from list");
 
             }
         }
@@ -189,7 +204,7 @@ public class House {
     public void printHouseList(){
         System.out.println("House list:");
         for(House h: condominiumHouses){
-            System.out.print(h.getID()+" ");
+            System.out.print(h.GetID()+" ");
         }
         System.out.print("\n");
     }
