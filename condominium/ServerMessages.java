@@ -62,6 +62,25 @@ public class ServerMessages {
         return stats;
     }
 
+    Stat[] GetGlobalStats(String serverIP, int quantity) throws IOException {
+
+        URL url = new URL( serverIP+"/server/get/"+quantity);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = in.readLine()) != null) {
+            response.append(line);
+        }
+        in.close();
+
+        Stat[] stats = gson.fromJson(response.toString(), Stat[].class);
+        return stats;
+    }
+
 
     public void addClient(String serverIP, String clientIP) throws IOException{
         URL url = new URL( serverIP+"/server/add/client");
@@ -123,8 +142,8 @@ public class ServerMessages {
         connection.getResponseCode();               // non so se serve
     }
 
-    public void SendNewStat(String serverIP, House h) throws IOException{
-        URL url = new URL( serverIP+"/server/new-stat");
+    public void SendNewLocalStat(String serverIP, House h) throws IOException{
+        URL url = new URL( serverIP+"/server/new-stat/local");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
@@ -132,6 +151,21 @@ public class ServerMessages {
         connection.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
         String jsonToServer = gson.toJson(h);
+        wr.writeBytes(jsonToServer);
+        wr.flush();
+        wr.close();
+        connection.getResponseCode();               // non so se serve
+    }
+
+    public void SendNewGlobalStat(String serverIP, Stat s) throws IOException{
+        URL url = new URL( serverIP+"/server/new-stat/global");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        connection.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+        String jsonToServer = gson.toJson(s);
         wr.writeBytes(jsonToServer);
         wr.flush();
         wr.close();

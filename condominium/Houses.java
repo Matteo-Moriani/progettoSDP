@@ -7,9 +7,11 @@ public class Houses {
     private List<House> houseList;
     private static Houses instance;
     Map<Integer,List<Stat>> houseStats = new HashMap<>();
+    private List<Stat> globalStats;
 
     public Houses() {
         houseList = new ArrayList<>();
+        globalStats = new ArrayList<>();
     }
 
     //deve essere un singleton
@@ -33,17 +35,30 @@ public class Houses {
         houseStats.remove(h);
     }
 
-    public void addStat(House h, Stat s){
+    public void addLocalStat(House h, Stat s){
         houseStats.get(h.GetID()).add(s);
         int lastIndex = houseStats.get(h.GetID()).size()-1;
         System.out.println("added "+houseStats.get(h.GetID()).get(lastIndex).GetMean());
     }
 
-    public Stat[] getStats(int quantity, int houseID){
+    public void addGlobalStat(Stat s){
+        globalStats.add(s);
+    }
+
+    public Stat[] getLocalStats(int quantity, int houseID){
         Stat[] stats = new Stat[quantity];
         int lastIndex = houseStats.get(houseID).size()-1;
         for(int i = 0; i<quantity; i++){
             stats[i] = houseStats.get(houseID).get(lastIndex-i);
+        }
+        return stats;
+    }
+
+    public Stat[] getGlobalStats(int quantity){
+        Stat[] stats = new Stat[quantity];
+        int lastIndex = globalStats.size()-1;
+        for(int i = 0; i<quantity; i++){
+            stats[i] = globalStats.get(lastIndex-i);
         }
         return stats;
     }

@@ -29,6 +29,7 @@ public class House {
     private static HouseSocket houseSocket;
     private static SmartMeterSimulator smartMeter;
     private List<House> housesSendingStat = new ArrayList<>();
+    private boolean coordinator;
 
     Gson gson;
 
@@ -51,6 +52,10 @@ public class House {
         // 2 - mi registro nel condominio e ricevo la lista di case
         Register();
         condominiumHouses = serverMessages.AskHouseList(serverIP);
+        if(condominiumHouses.size() == 1)
+            coordinator = true;
+        else
+            coordinator = false;
         printHouseList();
 
         // 3 - mi presento a tutte le altre case
@@ -83,20 +88,19 @@ public class House {
 //            System.out.println("sending "+id+" to "+h.GetID());
             houseMessages.SendNewStat(h, this);
         }
-        serverMessages.SendNewStat(serverIP, this);
+        serverMessages.SendNewLocalStat(serverIP, this);
     }
 
     public Stat GetLastStat(){
         return lastStat;
     }
 
-    public synchronized void NewStatFromHouse(House sendingStat){
+    public synchronized void NewStatFromHouse(House sendingStat) throws IOException{
         // se c'e' gia' la casa in questione, la sostituisco dalla lista mettendo la sua versione piu recente
         for(House h:housesSendingStat){
             if(h.GetID() == sendingStat.GetID()){
                 housesSendingStat.remove(h);
                 break;
-//                System.out.println("old version of "+h.GetID()+" removed");
             }
         }
         housesSendingStat.add(sendingStat);
@@ -109,7 +113,6 @@ public class House {
                 }
             }
             if(!matchFound){
-//                System.out.println("some house is still missing");
                 return;
             }
         }
@@ -119,6 +122,11 @@ public class House {
             sum = sum + h.GetLastStat().GetMean();
         }
         System.out.println(">>> total consumes: "+sum+" ("+sendingStat.GetLastStat().getTimestamp()+") <<<\n");
+        if(coordinator){
+            System.out.println("as a coordinator, I send the last global stat");
+            Stat globalStat = new Stat(sum, sendingStat.GetLastStat().getTimestamp());
+            serverMessages.SendNewGlobalStat(serverIP, globalStat);
+        }
         housesSendingStat.clear();
     }
 
@@ -208,4 +216,6 @@ public class House {
         }
         System.out.print("\n");
     }
+
+
 }

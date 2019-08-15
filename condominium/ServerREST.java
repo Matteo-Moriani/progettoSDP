@@ -117,7 +117,16 @@ public class ServerREST {
     @GET
     @Produces({"application/json"})
     public Response getHouseStats(@PathParam("n") int n, @PathParam("id") int id){
-        Stat[] lastStats = houses.getInstance().getStats(n, id);
+        Stat[] lastStats = houses.getInstance().getLocalStats(n, id);
+        String jsonStats = gson.toJson(lastStats);
+        return Response.ok(jsonStats).build();
+    }
+
+    @Path("get/{n}")
+    @GET
+    @Produces({"application/json"})
+    public Response getGlobalStats(@PathParam("n") int n){
+        Stat[] lastStats = houses.getInstance().getGlobalStats(n);
         String jsonStats = gson.toJson(lastStats);
         return Response.ok(jsonStats).build();
     }
@@ -132,13 +141,21 @@ public class ServerREST {
         return Response.ok().build();
     }
 
-    @Path("new-stat")
+    @Path("new-stat/local")
     @POST
     @Consumes({"application/json"})
-    public Response newStat(String jsonHouse){
+    public Response newLocalStat(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        System.out.println("trying to save last stat of "+h.GetID());
-        houses.getInstance().addStat(h,h.GetLastStat());
+        houses.getInstance().addLocalStat(h,h.GetLastStat());
+        return Response.ok().build();
+    }
+
+    @Path("new-stat/global")
+    @POST
+    @Consumes({"application/json"})
+    public Response newGlobalStat(String jsonStat){
+        Stat s = gson.fromJson(jsonStat, Stat.class);
+        houses.getInstance().addGlobalStat(s);
         return Response.ok().build();
     }
 }
