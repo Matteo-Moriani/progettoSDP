@@ -37,7 +37,7 @@ public class HouseBuffer implements Buffer {
                 lastStat.setMean(mean);
                 lastStat.setTimestamp(measure.getTimestamp());
                 try {
-                    myHouse.GetLastStat(lastStat);
+                    myHouse.AskLastStat(lastStat);
                 } catch (IOException e){
                     e.printStackTrace();
                 }

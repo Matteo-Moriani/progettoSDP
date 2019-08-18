@@ -13,6 +13,7 @@ public class HouseMessages {
     private final String INTRODUCE_METHOD = "introduce";
     private final String QUIT_METHOD = "quit";
     private final String NEW_STAT_METHOD = "new-stat";
+    private final String SET_OLDEST_METHOD = "set-oldest";
     private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
 
     public HouseMessages(){

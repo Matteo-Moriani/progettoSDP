@@ -43,6 +43,43 @@ public class ServerMessages {
         return list;
     }
 
+    House AskOldest(String IP) throws IOException {
+
+        URL url = new URL( IP+"/server/oldest");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = in.readLine()) != null) {
+            response.append(line);
+        }
+        in.close();
+
+        return gson.fromJson(response.toString(), House.class);
+    }
+
+    House AskNextAndRemove(String IP, House leaving) throws IOException {
+
+        int leavingID = leaving.GetID();
+        URL url = new URL( IP+"/server/new-next/"+leavingID);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = in.readLine()) != null) {
+            response.append(line);
+        }
+        in.close();
+
+        return gson.fromJson(response.toString(), House.class);
+    }
+
     Stat[] GetHouseStats(String serverIP, int quantity, int houseID) throws IOException {
 
         URL url = new URL( serverIP+"/server/get/"+quantity+"/"+houseID);
@@ -128,7 +165,7 @@ public class ServerMessages {
     }
 
     public void Leave(String serverIP, int houseID) throws IOException{
-        URL url = new URL( serverIP+"/server/removeHouse/house");
+        URL url = new URL( serverIP+"/server/remove-house");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("DELETE");
         connection.setRequestProperty("Content-Type", "application/json");

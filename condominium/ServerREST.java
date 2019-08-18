@@ -48,7 +48,7 @@ public class ServerREST {
     @Path("list")
     @GET
     @Produces({"application/json"})
-    public Response getHouseList(){
+    public Response GetHouseList(){
         List<House> list = houses.getInstance().getHouseList();
         House[] array = new House[list.size()];
 
@@ -61,11 +61,29 @@ public class ServerREST {
         return Response.ok(jsonArray).build();
     }
 
+    @Path("oldest")
+    @GET
+    @Produces({"application/json"})
+    public Response GetOldestHouse(){
+        House oldest = houses.getInstance().GetOldest();
+        String jsonOldest = gson.toJson(oldest);
+        return Response.ok(jsonOldest).build();
+    }
+
+    @Path("new-next/{id}")
+    @GET
+    @Produces({"application/json"})
+    public Response GetNewNextHouse(@PathParam("id") int id){
+        House newNext = houses.getInstance().GetNewNext(id);
+        String jsonNewNext = gson.toJson(newNext);
+        return Response.ok(jsonNewNext).build();
+    }
+
     //permette di inserire una casa se non ce n'e gia una con lo stesso id
     @Path("addHouse/house")
     @POST
     @Consumes({"application/json"})
-    public Response addHouse(String jsonHouse){
+    public Response AddHouse(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
         if(houses.getInstance().idAlreadyPresent(h.GetID())) {
             System.out.println("house "+h.GetID()+" already present");
@@ -88,10 +106,10 @@ public class ServerREST {
         }
     }
 
-    @Path("removeHouse/house")
+    @Path("remove-house")
     @DELETE
     @Consumes({"application/json"})
-    public Response removeHouse(String jsonHouseID) throws IOException{
+    public Response removeHouse(String jsonHouseID) {
         int houseID = gson.fromJson(jsonHouseID, int.class);
         House h = houses.getInstance().getByID(houseID);
         if(h!=null){
