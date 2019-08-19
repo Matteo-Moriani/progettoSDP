@@ -44,7 +44,7 @@ public class Houses {
                 if(houseList.indexOf(h) != houseList.size()-1)
                     index = houseList.indexOf(h)+1;
                 newNext = houseList.get(index);
-                removeHouse(h);
+//                removeHouse(h);
                 break;
             }
         }
@@ -62,13 +62,13 @@ public class Houses {
         houseList.remove(h);
         houseStats.remove(h);
         if(h.GetID() == oldest.GetID())
-            // se la casa che ho appena rimosso era anche la più vecchia, la più vecchia ora è quella a indice 0
-            oldest = houseList.get(0);
+            if(houseList.size() > 0)
+                // se la casa che ho appena rimosso era anche la più vecchia, la più vecchia ora è quella a indice 0
+                oldest = houseList.get(0);
     }
 
     public void addLocalStat(House h, Stat s){
         houseStats.get(h.GetID()).add(s);
-        int lastIndex = houseStats.get(h.GetID()).size()-1;
     }
 
     public void addGlobalStat(Stat s){

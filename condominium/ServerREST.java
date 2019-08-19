@@ -176,4 +176,14 @@ public class ServerREST {
         houses.getInstance().addGlobalStat(s);
         return Response.ok().build();
     }
+
+    @Path("boost")
+    @POST
+    @Consumes({"application/json"})
+    public Response BoostRequested(String jsonID) throws IOException{
+        int id = gson.fromJson(jsonID, int.class);
+        // trovare la maniera di riassumere tutti questi metodi
+        messages.BoostNotification(adminIP, id);
+        return Response.ok().build();
+    }
 }

@@ -13,7 +13,8 @@ public class HouseMessages {
     private final String INTRODUCE_METHOD = "introduce";
     private final String QUIT_METHOD = "quit";
     private final String NEW_STAT_METHOD = "new-stat";
-    private final String SET_OLDEST_METHOD = "set-oldest";
+    private final String ELECT_METHOD = "elect";
+    private final String TOKEN_METHOD = "token";
     private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
 
     public HouseMessages(){
@@ -41,6 +42,23 @@ public class HouseMessages {
         DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
         String message = gson.toJson(sendingStatHouse)+SPLIT+NEW_STAT_METHOD;
 //        System.out.println("sending "+message+" from "+sendingStatHouse.GetID()+" to "+target.GetID());
+        outToTarget.writeBytes(message);
+        socket.close();
+    }
+
+    public void Elect(House newCoordinator) throws IOException{
+        Socket socket = new Socket("localhost", newCoordinator.GetPort());
+        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+        String message = " "+SPLIT+ELECT_METHOD;
+        outToTarget.writeBytes(message);
+        socket.close();
+    }
+
+    public void SendToken(House target) throws IOException, InterruptedException{
+        Thread.sleep(1000);
+        Socket socket = new Socket("localhost", target.GetPort());
+        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+        String message = " "+SPLIT+TOKEN_METHOD;
         outToTarget.writeBytes(message);
         socket.close();
     }

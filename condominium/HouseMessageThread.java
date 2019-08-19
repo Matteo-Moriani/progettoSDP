@@ -34,22 +34,26 @@ public class HouseMessageThread extends Thread{
                     break;
                 case "quit":
                     int quittingID = gson.fromJson(input[0], int.class);
-                    house.RemoveHouse(quittingID);
+                    try {
+                        house.RemoveHouse(quittingID);
+                    } catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
                     break;
                 case "new-stat":
                     House sendingStatHouse = gson.fromJson(input[0], House.class);
-//                    System.out.println(house.GetID()+" is trying to receive last stat of "+sendingStatHouse.GetID());
                     house.NewStatFromHouse(sendingStatHouse);
                     break;
-//                case SetAdmin:
-//                    house.SetAdmin(gson.fromJson(mex.json, int.class));
-//                    break;
-//                case MorePowerToken:
-//                    house.ReceivedMorePowerToken();
-//                    break;
-//                case MeasurementsMean:
-//                    house.ReceivedMeasurementMean(gson.fromJson(mex.json, MeasurementMean.class));
-//                    break;
+                case "elect":
+                    house.SetCoordinator();
+                    break;
+                case "token":
+                    try {
+                        house.SetHasToken(true);
+                    } catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    break;
                 default:
                     System.out.println("there's something wrong with the message");
                     break;

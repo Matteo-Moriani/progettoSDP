@@ -151,12 +151,12 @@ public class AdminClient {
         return Response.ok().build();
     }
 
-    @Path("boost-request")
+    @Path("boost")
     @POST
     @Consumes({"application/json"})
-    public Response boostRequest(String jsonHouse){
-        House h = gson.fromJson(jsonHouse, House.class);
-        System.out.print("\n      NOTIFICATION: house "+h.GetID()+" has requested extra energy");
+    public Response BoostRequested(String jsonID) throws IOException{
+        int id = gson.fromJson(jsonID, int.class);
+        System.out.print("\n      NOTIFICATION: house "+id+" requested a boost");
         return Response.ok().build();
     }
 }

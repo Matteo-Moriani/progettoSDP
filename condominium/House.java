@@ -24,15 +24,19 @@ public class House {
     @Expose
     private boolean coordinator;
     private static House nextInRing;
-    private static boolean isNewest;
     private static String serverIP;
     private static List<House> condominiumHouses;
     private static HouseBuffer buffer;
     private static ServerMessages serverMessages;
     private static HouseMessages houseMessages;
-    private static HouseSocket houseSocket;
+    private static HouseSocketThread houseSocket;
+    private static TokenThread tokenThread;
     private static SmartMeterSimulator smartMeter;
     private List<House> housesSendingStat = new ArrayList<>();
+    private static boolean wantsBoost;
+    private static boolean hasToken;
+    private static boolean quitting = false;
+    private static final int TOKEN_QUANTITY = 2;
 
     Gson gson;
 
@@ -44,7 +48,7 @@ public class House {
         serverMessages = new ServerMessages();
         houseMessages = new HouseMessages();
         buffer = new HouseBuffer(this);
-        isNewest = true;
+        wantsBoost = false;
 
         System.out.println("\nHOUSE "+id+" (port "+port+")");
 
@@ -77,15 +81,23 @@ public class House {
 
         // 4 - mi metto in ascolto
         ServerSocket socket = new ServerSocket(port);
-        houseSocket = new HouseSocket(socket, this);
+        houseSocket = new HouseSocketThread(socket, this);
 
         // 5 - mi inserisco nell'anello
-        if(condominiumHouses.size() == 1)
+        if(condominiumHouses.size() == 1) {
             coordinator = true;
-        else
+            hasToken = true;
+        } else if(condominiumHouses.size() == 2){
             coordinator = false;
+            hasToken = true;
+        } else{
+            coordinator = false;
+            hasToken = false;
+        }
         // di base, la prossima nell'anello per l'ultima arrivata è la casa più vecchia
         nextInRing = serverMessages.AskOldest(serverIP);
+        tokenThread = new TokenThread(this);
+        tokenThread.start();
         printSituation();
     }
 
@@ -95,6 +107,50 @@ public class House {
 
     public int GetPort() {
         return port;
+    }
+
+    public List<House> GetList(){
+        return condominiumHouses;
+    }
+
+    public boolean WantsBoost(){
+        return wantsBoost;
+    }
+
+    public boolean HasToken(){
+        return hasToken;
+    }
+
+    public SmartMeterSimulator GetSmartMeter(){
+        return smartMeter;
+    }
+
+    public House GetNextInRing(){
+        return nextInRing;
+    }
+
+    public void SetHasToken(boolean settingTo) throws IOException, InterruptedException{
+        if(settingTo == true) {
+            if (!hasToken) {
+                hasToken = true;
+                System.out.println("received token");
+            } else {
+                if (condominiumHouses.size() > TOKEN_QUANTITY){
+                    // l'inoltro ha senso solo da 3 case in su
+                    System.out.println("I already have a token, sending this one to "+nextInRing.GetID());
+                    houseMessages.SendToken(nextInRing);
+                } else {
+                    System.out.println("waiting for more houses");
+                }
+            }
+        } else {
+            hasToken = false;
+            System.out.println("don't have a token anymore");
+        }
+    }
+
+    public void SetWantsBoost(boolean b){
+        wantsBoost = b;
     }
 
     public void AskLastStat(Stat lastStat) throws IOException{
@@ -108,6 +164,10 @@ public class House {
 
     public Stat GetLastStat(){
         return lastStat;
+    }
+
+    public boolean IsQuitting(){
+        return quitting;
     }
 
     public synchronized void NewStatFromHouse(House sendingStat) throws IOException{
@@ -168,8 +228,7 @@ public class House {
         new House(id, port, ServerREST.getPort(), ServerREST.getHost());
 
         Scanner scanner = new Scanner(System.in);
-        boolean quit = false;
-        while (!quit) {
+        while (!quitting) {
             System.out.println("\nCommands available:");
             System.out.println("1: quit");
             System.out.println("2: request boost");
@@ -183,17 +242,33 @@ public class House {
                 case "1":
                     System.out.println("quitting");
                     for(House h: condominiumHouses){
-                        if(h.GetID() != id)
+//                        if(h.GetID() != id)
                             // la casa che l'aveva come next comunicherà al server di cancellarla
                             houseMessages.Quit(h, id);
                     }
-                    quit = true;
-                    houseSocket.Quit();
+                    quitting = true;
                     smartMeter.stopMeGently();
+//                    synchronized (tokenThread) {
+//                        tokenThread.interrupt();
+//                    }
+                    // controllare sta cosa del coordinatore che non mi torna
+                    if(condominiumHouses.size() > 0)
+                        houseMessages.Elect(nextInRing);
+                    if(hasToken && condominiumHouses.size() >= TOKEN_QUANTITY)
+                        houseMessages.SendToken(nextInRing);
                     break;
-//                    case "2":
-//                        System.out.println(SendRequest("GET", "/stats/" + cmd[1] + "/" + cmd[2], ""));
-//                        break;
+                case "2":
+                    if(wantsBoost == false) {
+                        System.out.println("requesting boost, waiting for a token");
+                        wantsBoost = true;
+                        serverMessages.BoostRequested(serverIP, id);
+                    } else {
+                        System.out.println("boost request already pending");
+                    }
+                    break;
+                case "3":
+                    System.out.println(""+hasToken);
+                    break;
                 default:
                     System.out.println("Input '" + input + "' not valid.");
                     break;
@@ -207,34 +282,42 @@ public class House {
 
     public void AddHouse(House h){
         condominiumHouses.add(h);
-        if(isNewest) {
-            nextInRing = h;
-            isNewest = false;
-            System.out.println("new next in ring: "+ nextInRing.GetID());
+        // se io sono la penultima arrivata, allora l'ultima arrivata è la mia nuova next
+        try {
+            if (serverMessages.AskHouseList(serverIP).get(condominiumHouses.size() - 2).GetID() == id) {
+                nextInRing = h;
+                System.out.println("new next in ring: " + nextInRing.GetID());
+            }
+        }catch(IOException e){
+            e.printStackTrace();
         }
         System.out.println("\nHouse "+h.GetID()+" added to list");
         printSituation();
+        if(condominiumHouses.size() > TOKEN_QUANTITY) {
+            synchronized (tokenThread) {
+                tokenThread.notify();
+                System.out.println("there are more than "+TOKEN_QUANTITY+" houses, tokens are cycling.");
+            }
+        }
     }
 
-    public void RemoveHouse(int id) throws IOException{
+    public void RemoveHouse(int leavingID) throws IOException, InterruptedException{
         Iterator<House> iter = condominiumHouses.iterator();
         while(iter.hasNext()){
             House h = iter.next();
-            if(h.GetID() == id){
-                if(nextInRing.GetID() == id){
-                    nextInRing = serverMessages.AskNextAndRemove(serverIP, h);
+            if(h.GetID() == leavingID){
+                if(nextInRing.GetID() == leavingID && condominiumHouses.size() > 1){
+                    nextInRing = serverMessages.AskNext(serverIP, h);
                     System.out.println("My next was removed, new next is "+nextInRing.GetID());
                 }
+                serverMessages.Remove(serverIP, h.GetID());
                 iter.remove();
                 System.out.println("House "+h.GetID()+" removed from list");
                 break;
             }
         }
-        if(serverMessages.AskOldest(serverIP).GetID() == id) {
-            System.out.println("The coordinator was removed, now I am the coordinator");
-            coordinator = true;
-        }
-        printSituation();
+        if(leavingID!=id)
+            printSituation();
     }
 
     public void printSituation(){
@@ -244,7 +327,13 @@ public class House {
         }
         System.out.print("\n");
         System.out.println("my next in the ring is "+ nextInRing.GetID());
-        if(coordinator) System.out.println("I am the coordinator");
+        if(coordinator)
+            System.out.println("I am the coordinator");
+    }
+
+    public void SetCoordinator(){
+        coordinator = true;
+        System.out.println("now I am the coordinator");
     }
 
 }
