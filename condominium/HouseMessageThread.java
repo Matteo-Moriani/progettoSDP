@@ -34,11 +34,7 @@ public class HouseMessageThread extends Thread{
                     break;
                 case "quit":
                     int quittingID = gson.fromJson(input[0], int.class);
-                    try {
-                        house.RemoveHouse(quittingID);
-                    } catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
+                    house.RemoveHouse(quittingID);
                     break;
                 case "new-stat":
                     House sendingStatHouse = gson.fromJson(input[0], House.class);

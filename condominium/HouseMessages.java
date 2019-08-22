@@ -29,7 +29,7 @@ public class HouseMessages {
         socket.close();
     }
 
-    public void Quit(House target, int quittingHouseID) throws IOException{
+    public void Remove(House target, int quittingHouseID) throws IOException{
         Socket socket = new Socket("localhost", target.GetPort());
         DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
         String message = gson.toJson(quittingHouseID)+SPLIT+QUIT_METHOD;

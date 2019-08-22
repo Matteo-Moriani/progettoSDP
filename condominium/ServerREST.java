@@ -18,6 +18,7 @@ public class ServerREST {
     private static Houses houses;
     private static String adminIP;
     private static ServerMessages messages;
+    private static final String NO_CLIENT_ERROR = "didn't send the notification: client isn't active";
 
     public static void main(String[] args) throws IOException {
         messages = new ServerMessages();
@@ -80,7 +81,7 @@ public class ServerREST {
     }
 
     //permette di inserire una casa se non ce n'e gia una con lo stesso id
-    @Path("addHouse/house")
+    @Path("add-house")
     @POST
     @Consumes({"application/json"})
     public Response AddHouse(String jsonHouse){
@@ -100,7 +101,7 @@ public class ServerREST {
             try {
                 messages.HouseJoined(adminIP, h);
             } catch (IOException e){
-                System.out.println("client isn't active");
+                System.out.println(NO_CLIENT_ERROR);
             }
             return Response.ok().build();
         }
@@ -109,8 +110,9 @@ public class ServerREST {
     @Path("remove-house")
     @DELETE
     @Consumes({"application/json"})
-    public Response removeHouse(String jsonHouseID) {
+    public Response RemoveHouse(String jsonHouseID) {
         int houseID = gson.fromJson(jsonHouseID, int.class);
+        System.out.println("removing "+houseID);
         House h = houses.getInstance().getByID(houseID);
         if(h!=null){
             houses.getInstance().removeHouse(h);
@@ -123,7 +125,7 @@ public class ServerREST {
             try {
                 messages.HouseLeft(adminIP, h);
             } catch (IOException e){
-                System.out.println("client isn't active");
+                System.out.println(NO_CLIENT_ERROR);
             }
             return Response.ok().build();
         }
@@ -149,7 +151,7 @@ public class ServerREST {
         return Response.ok(jsonStats).build();
     }
 
-    @Path("add/client")
+    @Path("add-client")
     @POST
     @Consumes({"application/json"})
     public Response addClient(String jsonClientIP){
@@ -180,10 +182,14 @@ public class ServerREST {
     @Path("boost")
     @POST
     @Consumes({"application/json"})
-    public Response BoostRequested(String jsonID) throws IOException{
+    public Response BoostRequested(String jsonID){
         int id = gson.fromJson(jsonID, int.class);
         // trovare la maniera di riassumere tutti questi metodi
-        messages.BoostNotification(adminIP, id);
+        try {
+            messages.BoostNotification(adminIP, id);
+        } catch (IOException e){
+            System.out.println(NO_CLIENT_ERROR);
+        }
         return Response.ok().build();
     }
 }

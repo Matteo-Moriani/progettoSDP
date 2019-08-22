@@ -120,7 +120,7 @@ public class ServerMessages {
 
 
     public void addClient(String serverIP, String clientIP) throws IOException{
-        URL url = new URL( serverIP+"/server/add/client");
+        URL url = new URL( serverIP+"/server/add-client");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");

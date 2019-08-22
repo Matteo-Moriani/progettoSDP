@@ -44,7 +44,7 @@ public class Houses {
                 if(houseList.indexOf(h) != houseList.size()-1)
                     index = houseList.indexOf(h)+1;
                 newNext = houseList.get(index);
-//                removeHouse(h);
+//                RemoveHouse(h);
                 break;
             }
         }
