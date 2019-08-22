@@ -35,10 +35,8 @@ public class House {
     private List<House> housesSendingStat = new ArrayList<>();
     private static boolean boosting;
     private static boolean wantsBoost;
-    private boolean hasToken;
-//    private boolean[] token = new boolean[1];
     private static boolean quitting = false;
-    private static final int TOKEN_QUANTITY = 2;
+    private static final int TOTAL_TOKENS = 2;
 
     Gson gson;
 
@@ -99,24 +97,16 @@ public class House {
         // 6 - mi inserisco nell'anello
         if(condominiumHouses.size() == 1) {
             coordinator = true;
-//            hasToken = true;
-            token[0] = true;
-        } else if (condominiumHouses.size() > 1 && condominiumHouses.size() <= TOKEN_QUANTITY){
+        } else if (condominiumHouses.size() > 1 && condominiumHouses.size() <= TOTAL_TOKENS){
             coordinator = false;
-//            hasToken = true;
-            token[0] = true;
         } else {
             // da 3 case in su nel nostro caso
             coordinator = false;
-//            hasToken = false;
-            token[0] = false;
         }
         // di base, la prossima nell'anello per l'ultima arrivata è la casa più vecchia
         nextInRing = serverMessages.AskOldest(serverIP);
         tokenThread = new TokenThread(this);
-        tokenThread.setName("Token Manager");
         tokenThread.start();
-        // gli do il tempo di partire sennò questo mi fa notify all prima che si sia messo in attesa
         printSituation();
     }
 
@@ -140,12 +130,9 @@ public class House {
         return wantsBoost;
     }
 
-//    public boolean HasToken(){
-////        return hasToken;
-//        synchronized (token) {
-//            return token[0];
-//        }
-//    }
+    public TokenThread GetTokenThread(){
+        return tokenThread;
+    }
 
     public SmartMeterSimulator GetSmartMeter(){
         return smartMeter;
@@ -154,33 +141,6 @@ public class House {
     public House GetNextInRing(){
         return nextInRing;
     }
-
-//    public void SetHasToken(boolean settingTo) throws IOException, InterruptedException{
-//        if(settingTo == true) {
-////            if (!hasToken) {
-////                hasToken = true;
-//            if(!token[0]){
-//                synchronized (token) {
-//                    token[0] = true;
-//                }
-//                System.out.println("received token");
-//            } else {
-//                if (condominiumHouses.size() > TOKEN_QUANTITY){
-//                    // l'inoltro ha senso solo da 3 case in su
-//                    System.out.println("I already have a token, sending this one to "+nextInRing.GetID());
-//                    houseMessages.SendToken(nextInRing);
-//                } else {
-//                    System.out.println("(house) waiting for more houses");
-//                }
-//            }
-//        } else {
-////            hasToken = false;
-//            synchronized (token) {
-//                token[0] = false;
-//            }
-//            System.out.println("don't have a token anymore");
-//        }
-//    }
 
     public void SetWantsBoost(boolean b){
         wantsBoost = b;
@@ -330,10 +290,7 @@ public class House {
                 houseMessages.Elect(nextInRing);
             }
             // se avevo un token e rimangono almeno altre due case, lo mando al mio next
-            if (
-//                    hasToken
-                    token[0]
-                            && condominiumHouses.size() >= TOKEN_QUANTITY)
+            if (tokenThread.HoldingToken() && condominiumHouses.size() >= TOTAL_TOKENS)
                 houseMessages.SendToken(nextInRing);
         }
 
@@ -353,10 +310,10 @@ public class House {
         }
         System.out.println("\nHouse "+h.GetID()+" added to list");
         printSituation();
-        if(condominiumHouses.size() > TOKEN_QUANTITY) {
+        if(condominiumHouses.size() > TOTAL_TOKENS) {
             synchronized (tokenThread) {
                 tokenThread.notify();
-                System.out.println("there are more than "+TOKEN_QUANTITY+" houses, tokens are cycling.");
+                System.out.println("there are more than "+ TOTAL_TOKENS +" houses, tokens are cycling.");
             }
         }
     }

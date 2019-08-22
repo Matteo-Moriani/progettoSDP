@@ -1,44 +1,27 @@
 package condominium;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class TokenThread extends Thread {
     private House house;
     private HouseMessages houseMessages = new HouseMessages();
+    private boolean hold;
     private static final int TOTAL_TOKENS = 2;
+    private final Object tokenLock = new Object();
 
     public TokenThread(House house){
         this.house = house;
+        if(house.GetList().size() <= TOTAL_TOKENS)
+            hold = false;
+        else
+            hold = true;
     }
-
-//    public void run() {
-//        while (true) {
-//            if (house.hasToken) {
-//                if(house.GetList().size() > TOTAL_TOKENS)
-//                    SendTokenTo(house.GetNextInRing());
-//                else {
-//                    synchronized (this) {
-//                        try{
-//                            System.out.println("(token thread) waiting for more houses");
-//                            wait();
-//                        } catch(InterruptedException e){
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     public void run() {
         System.out.println("token thread started for house " + house.GetID());
-        System.out.println(Thread.getAllStackTraces());
 
         while (!house.IsQuitting()) {
-            // questa stampa inutile serve sennò non funziona nulla e non so perché
-//            System.out.print("");
-            if (house.HasToken()) {
+            if (HoldingToken()) {
                 if (house.WantsBoost()) {
                     try {
                         System.out.println("boost started, keeping the token "+System.nanoTime());
@@ -77,44 +60,41 @@ public class TokenThread extends Thread {
             try {
                 houseMessages.SendToken(h);
                 System.out.println("giving my token to " + h.GetID());
-                house.SetHasToken(false);
+                SetHold(false);
                 sent = true;
             } catch (Exception e1) {
                 System.out.println("I wasn't unable to send the token. waiting for a new next in the ring");
             }
         }
     }
-    public void SetHasToken(boolean settingTo) throws IOException, InterruptedException{
+
+    public void SetHold(boolean settingTo) throws IOException, InterruptedException{
         if(settingTo == true) {
-//            if (!hasToken) {
-//                hasToken = true;
-            if(!token[0]){
-                synchronized (token) {
-                    token[0] = true;
+            if(!hold){
+                synchronized (tokenLock) {
+                    hold = true;
                 }
                 System.out.println("received token");
             } else {
-                if (condominiumHouses.size() > TOKEN_QUANTITY){
+                if (house.GetList().size() > TOTAL_TOKENS){
                     // l'inoltro ha senso solo da 3 case in su
-                    System.out.println("I already have a token, sending this one to "+nextInRing.GetID());
-                    houseMessages.SendToken(nextInRing);
+                    System.out.println("I already have a token, sending this one to "+house.GetNextInRing().GetID());
+                    houseMessages.SendToken(house.GetNextInRing());
                 } else {
                     System.out.println("(house) waiting for more houses");
                 }
             }
         } else {
-//            hasToken = false;
-            synchronized (token) {
-                token[0] = false;
+            synchronized (tokenLock) {
+                hold = false;
             }
             System.out.println("don't have a token anymore");
         }
     }
 
-    public boolean HasToken(){
-//        return hasToken;
-        synchronized (token) {
-            return token[0];
+    public boolean HoldingToken(){
+        synchronized (tokenLock) {
+            return hold;
         }
     }
 
