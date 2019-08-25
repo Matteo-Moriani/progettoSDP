@@ -34,7 +34,6 @@ public class House {
     private static SmartMeterSimulator smartMeter;
     private List<House> housesSendingStat = new ArrayList<>();
     private static boolean boosting;
-    private static boolean wantsBoost;
     private static boolean quitting = false;
     private static final int TOTAL_TOKENS = 2;
 
@@ -48,7 +47,6 @@ public class House {
         serverMessages = new ServerMessages();
         houseMessages = new HouseMessages();
         buffer = new HouseBuffer(this);
-        wantsBoost = false;
         boosting = false;
 
         System.out.println("\nHOUSE "+id+" (port "+port+")");
@@ -59,8 +57,9 @@ public class House {
             try{
                 condominiumHouses = serverMessages.AskHouseList(serverIP);
                 waitingForServer = false;
+                System.out.println("connection with server established");
             } catch (IOException e){
-                System.out.println("server isn't running");
+                System.out.println("server isn't running, retrying...");
                 Thread.sleep(1000);
             }
         }
@@ -126,10 +125,6 @@ public class House {
         return condominiumHouses;
     }
 
-    public boolean WantsBoost(){
-        return wantsBoost;
-    }
-
     public TokenThread GetTokenThread(){
         return tokenThread;
     }
@@ -140,10 +135,6 @@ public class House {
 
     public House GetNextInRing(){
         return nextInRing;
-    }
-
-    public void SetWantsBoost(boolean b){
-        wantsBoost = b;
     }
 
     public void AskLastStat(Stat lastStat) throws IOException{
@@ -237,10 +228,13 @@ public class House {
                     break;
                 case "2":
                     if(!quitting) {
-                        if (wantsBoost == false) {
+                        if (!tokenThread.BoostRequested()) {
                             System.out.println("requesting boost, waiting for a token");
-                            wantsBoost = true;
+                            tokenThread.SetWantsBoost(true);
                             serverMessages.BoostRequested(serverIP, id);
+                            synchronized (tokenThread) {
+                                tokenThread.notify();
+                            }
                         } else {
                             System.out.println("boost request already pending");
                         }
@@ -261,25 +255,20 @@ public class House {
 
     public void Quit() throws IOException, InterruptedException{
         System.out.println("quitting...");
-        // i thread token e houseSocket escono dai loro cicli while
+
+        // 1 - i thread token e houseSocket escono dai loro cicli while
         quitting = true;
-        if(wantsBoost) {
-            wantsBoost = false;
+
+        // 2 - se stavo aspettando un boost ma ancora non è iniziato, non lo voglio più
+        if(tokenThread.BoostRequested()) {
+            tokenThread.SetWantsBoost(false);
             System.out.println("deleting pending boost request");
         }
-        synchronized (this) {
-            //aspetto di aver finito di boostare prima rimuovermi dalle liste e di chiudere tutto
-            while (boosting) {
-                System.out.println("waiting boost to end");
-                wait();
-            }
-        }
-        smartMeter.stopMeGently();
-        System.out.println("smart meter stopped");
 
+        // 3 - mi cancello ora dalle liste perché poi andrò in wait, inoltre gestisco coordinatore e token
         // voglio che si cancellino dalle liste una alla volta, così basta?
+        serverMessages.Remove(serverIP, id);
         synchronized (this) {
-            serverMessages.Remove(serverIP, id);
             for (House h : condominiumHouses) {
                 System.out.println("telling house " + h.GetID() + " to remove me from its list");
                 houseMessages.Remove(h, id);
@@ -294,6 +283,16 @@ public class House {
                 houseMessages.SendToken(nextInRing);
         }
 
+        //4 - se stavo boostando, faccio finire così poi mando il token al next
+        while (boosting) {
+            synchronized (this) {
+                System.out.println("waiting boost to end to release and pass the token");
+                wait();
+                System.out.println("boost ended and token sent, now I can quit");
+            }
+        }
+        smartMeter.stopMeGently();
+        System.out.println("smart meter stopped");
         System.out.println("I quit successfully");
     }
 

@@ -6,31 +6,41 @@ public class TokenThread extends Thread {
     private House house;
     private HouseMessages houseMessages = new HouseMessages();
     private boolean hold;
-    private static final int TOTAL_TOKENS = 2;
+    private boolean wantsBoost = false;
     private final Object tokenLock = new Object();
+    private final Object boostLock = new Object();
+    private static final int TOTAL_TOKENS = 2;
 
     public TokenThread(House house){
         this.house = house;
-        if(house.GetList().size() <= TOTAL_TOKENS)
+        if(house.GetList().size() > TOTAL_TOKENS)
             hold = false;
         else
             hold = true;
     }
 
     public void run() {
-        System.out.println("token thread started for house " + house.GetID());
+        System.out.println("token thread started");
 
         while (!house.IsQuitting()) {
+            boolean alreadySent = false;
+
             if (HoldingToken()) {
-                if (house.WantsBoost()) {
+                if (BoostRequested()) {
+                    System.out.println("boost requested");
                     try {
                         System.out.println("boost started, keeping the token "+System.nanoTime());
                         System.out.println("\nit will last 3 seconds\n");
                         house.SetBoosting(true);
                         house.GetSmartMeter().boost();
-                        house.SetWantsBoost(false);
+                        SetWantsBoost(false);
                         System.out.println("boost ended, releasing the token "+System.nanoTime());
                         house.SetBoosting(false);
+                        // non lo mando a me stesso che tanto se sto uscendo e sono l'ultimo rimasto non ha senso
+                        if(house.GetNextInRing().GetID() != house.GetID()) {
+                            SendTokenTo(house.GetNextInRing());
+                            alreadySent = true;
+                        }
                         synchronized (house) {
                             house.notify();
                         }
@@ -38,20 +48,25 @@ public class TokenThread extends Thread {
                         e.printStackTrace();
                     }
                 }
-                if(house.GetList().size() > TOTAL_TOKENS)
+                if(house.GetList().size() > TOTAL_TOKENS && alreadySent == false) {
                     SendTokenTo(house.GetNextInRing());
+                }
                 else {
-                    synchronized (this) {
-                        try{
-                            System.out.println("(token thread) waiting for more houses");
-                            wait();
-                        } catch(InterruptedException e){
-                            e.printStackTrace();
+                    if(!house.IsQuitting()) {
+                        synchronized (this) {
+                            try {
+                                System.out.println("waiting for more houses");
+                                wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
             }
         }
+
+        System.out.println("token thread ended");
     }
 
     public void SendTokenTo(House h){
@@ -95,6 +110,18 @@ public class TokenThread extends Thread {
     public boolean HoldingToken(){
         synchronized (tokenLock) {
             return hold;
+        }
+    }
+
+    public boolean BoostRequested(){
+        synchronized (boostLock) {
+            return wantsBoost;
+        }
+    }
+
+    public void SetWantsBoost(boolean b){
+        synchronized (boostLock) {
+            wantsBoost = b;
         }
     }
 
