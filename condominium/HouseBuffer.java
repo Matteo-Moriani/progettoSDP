@@ -21,12 +21,13 @@ public class HouseBuffer implements Buffer {
     }
 
     public void addMeasurement(Measurement measure) {   // poi riguarda come funziona esattamente
-        lastMeasurements.add(measure);                    // addHouse lo mette alla fine
+        lastMeasurements.add(measure);                    // AddHouse lo mette alla fine
         counter++;
 
         if (lastMeasurements.size() > WINDOW)
             lastMeasurements.remove(0);             // quello con indice 0 è il meno recente
 
+        // controllo che non stia quittando sennò potrei inviare a me stesso ma nel frattempo avrei chiuso
         if (lastMeasurements.size() == WINDOW) {
             if (counter >= WINDOW * OVERLAP) {              // il maggiore mi serve per la prima volta
                 double tot = 0;

@@ -17,11 +17,13 @@ import java.util.Scanner;
 public class AdminClient {
 
     static ServerMessages messages = new ServerMessages();
-    private static String serverIP = "http://"+ServerREST.getHost()+":"+ServerREST.getPort();
+    private static String serverIP = "http://"+ServerREST.GetHost()+":"+ServerREST.GetPort();
     private static final String clientIP = "http://localhost:111";
     private static final String HOST = "localhost";
     private static final int PORT = 111;
     private static Gson gson;
+    private static final String NOT_ENOUGH_STATS_ERROR = "There aren't enough stats registered, please request a lower number.";
+    private static final String FORMAT_ERROR = "Please follow the right command format";
 
     public static void main(String[] args) throws InterruptedException, IOException {
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -34,7 +36,7 @@ public class AdminClient {
         boolean waitingForServer = true;
         while(waitingForServer){
             try {
-                messages.addClient(serverIP, clientIP);
+                messages.AddClient(serverIP, clientIP);
                 waitingForServer = false;
             } catch (IOException e){
                 Thread.sleep(1000);
@@ -61,73 +63,97 @@ public class AdminClient {
             double mean,standardDev;
             Stat[] stats;
 
-            switch (command[0]) {
-                case "1":
-                    System.out.println("house list:");
-                    List<House> houseList = messages.AskHouseList(serverIP);
-                    for(House h:houseList){
-                        System.out.print(h.GetID()+" ");
-                    }
-                    break;
-                case "2":
-                    n = Integer.parseInt(command[1]);
-                    id = Integer.parseInt(command[2]);
-                    stats = messages.GetHouseStats(serverIP, n, id);
-                    System.out.println("house "+id+" last "+n+" stats:");
-                    for(int i = 0; i<stats.length; i++) {
-                        System.out.println("    "+(i+1)+": "+stats[i].GetMean()+" ("+stats[i].getTimestamp()+")");
-                    }
-                    break;
-                case "3":
-                    n = Integer.parseInt(command[1]);
-                    stats = messages.GetGlobalStats(serverIP, n);
-                    System.out.println("last "+n+" global stats:");
-                    for(int i = 0; i<stats.length; i++) {
-                        System.out.println("    "+(i+1)+": "+stats[i].GetMean()+" ("+stats[i].getTimestamp()+")");
-                    }
-                    break;
-                case "4":
-                    n = Integer.parseInt(command[1]);
-                    id = Integer.parseInt(command[2]);
-                    stats = messages.GetHouseStats(serverIP, n, id);
-                    mean = 0;
-                    for(int i=0; i<n; i++){
-                        mean = mean + stats[i].GetMean();
-                    }
-                    mean = mean/n;
-                    standardDev = 0;
-                    for(int i=0; i<n; i++){
-                        standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
-                    }
-                    standardDev = Math.pow(standardDev/n, 0.5);
-                    System.out.println("mean of house "+id+" last "+n+" stats: "+mean);
-                    System.out.println("standard deviation of house "+id+" last "+n+" stats: "+standardDev);
-                    break;
-                case "5":
-                    n = Integer.parseInt(command[1]);
-                    stats = messages.GetGlobalStats(serverIP, n);
-                    mean = 0;
-                    for(int i=0; i<n; i++){
-                        mean = mean + stats[i].GetMean();
-                    }
-                    mean = mean/n;
-                    standardDev = 0;
-                    for(int i=0; i<n; i++){
-                        standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
-                    }
-                    standardDev = Math.pow(standardDev/n, 0.5);
-                    System.out.println("mean of last "+n+" global stats: "+mean);
-                    System.out.println("standard deviation of last "+n+" global stats: "+standardDev);
-                    break;
-                case "6":
-                    quit = true;
-                    admin.stop(0);
-                    break;
-                default:
-                    System.out.println("Input '" + input + "' not valid.");
-                    break;
+            try {
+                switch (command[0]) {
+                    case "1":
+                        System.out.println("house list:");
+                        List<House> houseList = messages.AskHouseList(serverIP);
+                        for(House h:houseList){
+                            System.out.print(h.GetID()+" ");
+                        }
+                        break;
+                    case "2":
+                        try {
+                            n = Integer.parseInt(command[1]);
+                            id = Integer.parseInt(command[2]);
+                            stats = messages.GetHouseStats(serverIP, n, id);
+                            if(stats == null){
+                                System.out.println("house " +id+ " doesn't exist");
+                                break;
+                            }
+                            System.out.println("house " + id + " last " + n + " stats:");
+                            for (int i = 0; i < stats.length; i++) {
+                                System.out.println("    " + (i + 1) + ": " + stats[i].GetMean() + " (" + stats[i].getTimestamp() + ")");
+                            }
+                        } catch(IOException e) {
+                            System.out.println(NOT_ENOUGH_STATS_ERROR);
+                        }
+                        break;
+                    case "3":
+                        try {
+                            n = Integer.parseInt(command[1]);
+                            stats = messages.GetGlobalStats(serverIP, n);
+                            System.out.println("last " + n + " global stats:");
+                            for (int i = 0; i < stats.length; i++) {
+                                System.out.println("    " + (i + 1) + ": " + stats[i].GetMean() + " (" + stats[i].getTimestamp() + ")");
+                            }
+                        } catch (IOException e){
+                            System.out.println(NOT_ENOUGH_STATS_ERROR);
+                        }
+                        break;
+                    case "4":
+                        try {
+                            n = Integer.parseInt(command[1]);
+                            id = Integer.parseInt(command[2]);
+                            stats = messages.GetHouseStats(serverIP, n, id);
+                            mean = 0;
+                            for (int i = 0; i < n; i++) {
+                                mean = mean + stats[i].GetMean();
+                            }
+                            mean = mean / n;
+                            standardDev = 0;
+                            for (int i = 0; i < n; i++) {
+                                standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
+                            }
+                            standardDev = Math.pow(standardDev / n, 0.5);
+                            System.out.println("mean of house " + id + " last " + n + " stats: " + mean);
+                            System.out.println("standard deviation of house " + id + " last " + n + " stats: " + standardDev);
+                        } catch(IOException e) {
+                            System.out.println(NOT_ENOUGH_STATS_ERROR);
+                        }
+                        break;
+                    case "5":
+                        try{
+                            n = Integer.parseInt(command[1]);
+                            stats = messages.GetGlobalStats(serverIP, n);
+                            mean = 0;
+                            for(int i=0; i<n; i++){
+                                mean = mean + stats[i].GetMean();
+                            }
+                            mean = mean/n;
+                            standardDev = 0;
+                            for(int i=0; i<n; i++){
+                                standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
+                            }
+                            standardDev = Math.pow(standardDev/n, 0.5);
+                            System.out.println("mean of last "+n+" global stats: "+mean);
+                            System.out.println("standard deviation of last "+n+" global stats: "+standardDev);
+                        } catch(IOException e) {
+                            System.out.println(NOT_ENOUGH_STATS_ERROR);
+                        }
+                        break;
+                    case "6":
+                        quit = true;
+                        admin.stop(0);
+                        break;
+                    default:
+                        System.out.println(FORMAT_ERROR);
+                        break;
                 }
                 System.out.print("\n");
+            } catch (NumberFormatException e){
+                System.out.println(FORMAT_ERROR);
+            }
         }
         System.out.println("quitting");
         System.exit(0);

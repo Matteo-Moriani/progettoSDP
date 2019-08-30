@@ -18,7 +18,7 @@ public class HouseSocketThread extends Thread {
 
     public void run() {
         System.out.println("\nSocket listening at port " + house.GetPort());
-        while (!house.IsQuitting()) {
+        while (true) {
             try {
                 Socket messageSocket = socket.accept();
                 new HouseMessageThread(messageSocket, house);
@@ -27,10 +27,10 @@ public class HouseSocketThread extends Thread {
                 // Restart the socket.
             }
         }
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            socket.close();
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
     }
 }

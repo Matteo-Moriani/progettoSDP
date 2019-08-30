@@ -15,14 +15,14 @@ public class Houses {
         globalStats = new ArrayList<>();
     }
 
-    //deve essere un singleton
-    public synchronized static Houses getInstance(){
+    //singleton
+    public synchronized static Houses GetInstance(){
         if(instance==null)
             instance = new Houses();
         return instance;
     }
 
-    public synchronized List<House> getHouseList() { // prendo copia lista
+    public synchronized List<House> GetHouseList() { // prendo copia lista
         return new ArrayList<>(houseList);
     }
 
@@ -30,16 +30,16 @@ public class Houses {
         return oldest;
     }
 
-    public House GetNewNext(int leavingID){
+    public House GetNewNext(int houseInNeed){
         // nel caso in cui la casa uscente è l'ultima, va bene 0 con indice del successore
         int index = 0;
         Iterator<House> iter = houseList.iterator();
         House newNext = houseList.get(0);
         while(iter.hasNext()){
             House h = iter.next();
-            System.out.println("checking if "+h.GetID()+" is equal to "+leavingID);
-            if(h.GetID() == leavingID){
-                System.out.println("found "+leavingID+" at index "+houseList.indexOf(h));
+//            System.out.println("checking if "+h.GetID()+" is equal to "+leavingID);
+            if(h.GetID() == houseInNeed){
+//                System.out.println("found "+houseInNeed+" at index "+houseList.indexOf(h));
                 //se non stiamo parlando dell'ultima nell'anello
                 if(houseList.indexOf(h) != houseList.size()-1)
                     index = houseList.indexOf(h)+1;
@@ -51,14 +51,14 @@ public class Houses {
         return newNext;
     }
 
-    public synchronized void addHouse(House h){
+    public synchronized void AddHouse(House h){
         houseList.add(h);
         houseStats.put(h.GetID(), new ArrayList<>());
         if(houseList.size() == 1)
             oldest = h;
     }
 
-    public synchronized void removeHouse(House h){
+    public synchronized void RemoveHouse(House h){
         houseList.remove(h);
         houseStats.remove(h);
         if(h.GetID() == oldest.GetID())
@@ -67,35 +67,43 @@ public class Houses {
                 oldest = houseList.get(0);
     }
 
-    public void addLocalStat(House h, Stat s){
+    public void AddLocalStat(House h, Stat s){
         houseStats.get(h.GetID()).add(s);
     }
 
-    public void addGlobalStat(Stat s){
+    public void AddGlobalStat(Stat s){
         globalStats.add(s);
 //        System.out.println("global stats available: "+globalStats.size());
     }
 
-    public Stat[] getLocalStats(int quantity, int houseID){
-        Stat[] stats = new Stat[quantity];
+    public Stat[] GetLocalStats(int requestedQuantity, int houseID){
+        Stat[] stats = new Stat[requestedQuantity];
         int lastIndex = houseStats.get(houseID).size()-1;
-        for(int i = 0; i<quantity; i++){
-            stats[i] = houseStats.get(houseID).get(lastIndex-i);
+        if(lastIndex+1 >= requestedQuantity) {
+            for (int i = 0; i < requestedQuantity; i++) {
+                stats[i] = houseStats.get(houseID).get(lastIndex - i);
+            }
+            return stats;
+        } else {
+            return null;
         }
-        return stats;
     }
 
-    public Stat[] getGlobalStats(int quantity){
-        Stat[] stats = new Stat[quantity];
+    public Stat[] GetGlobalStats(int requestedQuantity){
+        Stat[] stats = new Stat[requestedQuantity];
         int lastIndex = globalStats.size()-1;
-        for(int i = 0; i<quantity; i++){
-            stats[i] = globalStats.get(lastIndex-i);
+        if(lastIndex+1 >= requestedQuantity) {
+            for (int i = 0; i < requestedQuantity; i++) {
+                stats[i] = globalStats.get(lastIndex - i);
+            }
+            return stats;
+        } else {
+            return null;
         }
-        return stats;
     }
 
-    public House getByID(int id){
-        List<House> usersCopy = getHouseList();
+    public House GetByID(int id){
+        List<House> usersCopy = GetHouseList();
 
         for(House h: usersCopy)
             if(h.GetID() == id)
@@ -103,8 +111,8 @@ public class Houses {
         return null;
     }
 
-    public boolean idAlreadyPresent(int id){
-        List<House> usersCopy = getHouseList();
+    public boolean ExistingID(int id){
+        List<House> usersCopy = GetHouseList();
 
         for(House h: usersCopy)
             if(h.GetID() == id)

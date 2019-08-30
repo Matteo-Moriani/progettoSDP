@@ -16,6 +16,7 @@ public class HouseMessages {
     private final String ELECT_METHOD = "elect";
     private final String TOKEN_METHOD = "token";
     private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
+    private final String REMOVED_METHOD = "removed";
 
     public HouseMessages(){
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -62,4 +63,12 @@ public class HouseMessages {
         outToTarget.writeBytes(message);
         socket.close();
     }
+
+//    public void SendConfirm(int id, House removed) throws IOException{
+//        Socket socket = new Socket("localhost", removed.GetPort());
+//        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+//        String message = gson.toJson(id)+SPLIT+REMOVED_METHOD;
+//        outToTarget.writeBytes(message);
+//        socket.close();
+//    }
 }

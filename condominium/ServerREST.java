@@ -37,11 +37,11 @@ public class ServerREST {
         System.out.println("Server stopped");
     }
 
-    public static String getHost(){
+    public static String GetHost(){
         return HOST;
     }
 
-    public static int getPort(){
+    public static int GetPort(){
         return PORT;
     }
 
@@ -50,7 +50,7 @@ public class ServerREST {
     @GET
     @Produces({"application/json"})
     public Response GetHouseList(){
-        List<House> list = houses.getInstance().getHouseList();
+        List<House> list = houses.GetInstance().GetHouseList();
         House[] array = new House[list.size()];
 
         int i = 0;
@@ -66,7 +66,7 @@ public class ServerREST {
     @GET
     @Produces({"application/json"})
     public Response GetOldestHouse(){
-        House oldest = houses.getInstance().GetOldest();
+        House oldest = houses.GetInstance().GetOldest();
         String jsonOldest = gson.toJson(oldest);
         return Response.ok(jsonOldest).build();
     }
@@ -75,7 +75,7 @@ public class ServerREST {
     @GET
     @Produces({"application/json"})
     public Response GetNewNextHouse(@PathParam("id") int id){
-        House newNext = houses.getInstance().GetNewNext(id);
+        House newNext = houses.GetInstance().GetNewNext(id);
         String jsonNewNext = gson.toJson(newNext);
         return Response.ok(jsonNewNext).build();
     }
@@ -84,17 +84,17 @@ public class ServerREST {
     @Path("add-house")
     @POST
     @Consumes({"application/json"})
-    public Response AddHouse(String jsonHouse){
+    public synchronized Response AddHouse(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        if(houses.getInstance().idAlreadyPresent(h.GetID())) {
+        if(houses.GetInstance().ExistingID(h.GetID())) {
             System.out.println("house "+h.GetID()+" already present");
-            return Response.serverError().build();                  // scegliere poi l'errore giusto
+            return Response.serverError().build();
         }
         else{
-            houses.getInstance().addHouse(h);
+            houses.GetInstance().AddHouse(h);
             System.out.println("house "+h.GetID()+" added");
             System.out.println("new list: ");
-            for(House i:houses.getInstance().getHouseList()){
+            for(House i:houses.GetInstance().GetHouseList()){
                 System.out.print(i.GetID()+" ");
             }
             System.out.print("\n");
@@ -111,14 +111,20 @@ public class ServerREST {
     @DELETE
     @Consumes({"application/json"})
     public Response RemoveHouse(String jsonHouseID) {
+        // per testare l'entrata nel ring di una casa durante l'uscita del next che gli sta venendo assegnato
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
         int houseID = gson.fromJson(jsonHouseID, int.class);
         System.out.println("removing "+houseID);
-        House h = houses.getInstance().getByID(houseID);
+        House h = houses.GetInstance().GetByID(houseID);
         if(h!=null){
-            houses.getInstance().removeHouse(h);
+            houses.GetInstance().RemoveHouse(h);
             System.out.println("house "+h.GetID()+" removed");
             System.out.println("new list: ");
-            for(House i:houses.getInstance().getHouseList()){
+            for(House i:houses.GetInstance().GetHouseList()){
                 System.out.print(i.GetID()+" ");
             }
             System.out.print("\n");
@@ -136,25 +142,36 @@ public class ServerREST {
     @Path("get/{n}/{id}")
     @GET
     @Produces({"application/json"})
-    public Response getHouseStats(@PathParam("n") int n, @PathParam("id") int id){
-        Stat[] lastStats = houses.getInstance().getLocalStats(n, id);
-        String jsonStats = gson.toJson(lastStats);
-        return Response.ok(jsonStats).build();
+    public Response GetHouseStats(@PathParam("n") int n, @PathParam("id") int id){
+        boolean idExist = houses.GetInstance().ExistingID(id);
+        if(!idExist)
+            return Response.ok(null).build();
+        Stat[] lastStats = houses.GetInstance().GetLocalStats(n, id);
+        if(lastStats != null) {
+            String jsonStats = gson.toJson(lastStats);
+            return Response.ok(jsonStats).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @Path("get/{n}")
     @GET
     @Produces({"application/json"})
-    public Response getGlobalStats(@PathParam("n") int n){
-        Stat[] lastStats = houses.getInstance().getGlobalStats(n);
-        String jsonStats = gson.toJson(lastStats);
-        return Response.ok(jsonStats).build();
+    public Response GetGlobalStats(@PathParam("n") int n){
+        Stat[] lastStats = houses.GetInstance().GetGlobalStats(n);
+        if(lastStats != null) {
+            String jsonStats = gson.toJson(lastStats);
+            return Response.ok(jsonStats).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @Path("add-client")
     @POST
     @Consumes({"application/json"})
-    public Response addClient(String jsonClientIP){
+    public Response AddClient(String jsonClientIP){
         String ip = gson.fromJson(jsonClientIP, String.class);
         adminIP = ip;
         System.out.println("client has been initialized (IP "+adminIP+")");
@@ -164,18 +181,18 @@ public class ServerREST {
     @Path("new-stat/local")
     @POST
     @Consumes({"application/json"})
-    public Response newLocalStat(String jsonHouse){
+    public Response NewLocalStat(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
-        houses.getInstance().addLocalStat(h,h.GetLastStat());
+        houses.GetInstance().AddLocalStat(h,h.GetLastStat());
         return Response.ok().build();
     }
 
     @Path("new-stat/global")
     @POST
     @Consumes({"application/json"})
-    public Response newGlobalStat(String jsonStat){
+    public Response NewGlobalStat(String jsonStat){
         Stat s = gson.fromJson(jsonStat, Stat.class);
-        houses.getInstance().addGlobalStat(s);
+        houses.GetInstance().AddGlobalStat(s);
         return Response.ok().build();
     }
 

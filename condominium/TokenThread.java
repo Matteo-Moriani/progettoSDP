@@ -74,11 +74,13 @@ public class TokenThread extends Thread {
         while(!sent) {
             try {
                 houseMessages.SendToken(h);
-                System.out.println("giving my token to " + h.GetID());
+//                System.out.println("giving my token to " + h.GetID());
                 SetHold(false);
                 sent = true;
             } catch (Exception e1) {
-                System.out.println("I wasn't unable to send the token. waiting for a new next in the ring");
+                System.out.println("I wasn't unable to send the token. waiting for a new successor in the ring");
+                if(house.GetList().size() <= TOTAL_TOKENS)
+                    break;
             }
         }
     }
@@ -89,21 +91,21 @@ public class TokenThread extends Thread {
                 synchronized (tokenLock) {
                     hold = true;
                 }
-                System.out.println("received token");
+//                System.out.println("received token");
             } else {
                 if (house.GetList().size() > TOTAL_TOKENS){
                     // l'inoltro ha senso solo da 3 case in su
-                    System.out.println("I already have a token, sending this one to "+house.GetNextInRing().GetID());
+//                    System.out.println("I already have a token, sending this one to "+house.GetNextInRing().GetID());
                     houseMessages.SendToken(house.GetNextInRing());
                 } else {
-                    System.out.println("(house) waiting for more houses");
+//                    System.out.println("(house) waiting for more houses");
                 }
             }
         } else {
             synchronized (tokenLock) {
                 hold = false;
             }
-            System.out.println("don't have a token anymore");
+//            System.out.println("don't have a token anymore");
         }
     }
 

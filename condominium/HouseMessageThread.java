@@ -49,6 +49,9 @@ public class HouseMessageThread extends Thread{
                         e.printStackTrace();
                     }
                     break;
+//                case "removed":
+//                    house.AddConfirm(gson.fromJson(input[0], int.class));
+//                    break;
                 default:
                     System.out.println("there's something wrong with the message");
                     break;

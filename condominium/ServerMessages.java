@@ -61,9 +61,9 @@ public class ServerMessages {
         return gson.fromJson(response.toString(), House.class);
     }
 
-    House AskNext(String IP, House leaving) throws IOException {
+    House AskNext(String IP, House inNeed) throws IOException {
 
-        int leavingID = leaving.GetID();
+        int leavingID = inNeed.GetID();
         URL url = new URL( IP+"/server/new-next/"+leavingID);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -95,6 +95,8 @@ public class ServerMessages {
         }
         in.close();
 
+        if(response == null)
+            return null;
         Stat[] stats = gson.fromJson(response.toString(), Stat[].class);
         return stats;
     }
@@ -119,7 +121,7 @@ public class ServerMessages {
     }
 
 
-    public void addClient(String serverIP, String clientIP) throws IOException{
+    public void AddClient(String serverIP, String clientIP) throws IOException{
         URL url = new URL( serverIP+"/server/add-client");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
