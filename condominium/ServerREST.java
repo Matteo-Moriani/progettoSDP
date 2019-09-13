@@ -17,11 +17,11 @@ public class ServerREST {
     private static Gson gson;
     private static Houses houses;
     private static String adminIP;
-    private static ServerMessages messages;
+    private static AdminMessages adminMessages;
     private static final String NO_CLIENT_ERROR = "didn't send the notification: client isn't active";
 
     public static void main(String[] args) throws IOException {
-        messages = new ServerMessages();
+        adminMessages = new AdminMessages();
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         houses = new Houses();
 
@@ -99,7 +99,7 @@ public class ServerREST {
             }
             System.out.print("\n");
             try {
-                messages.HouseJoined(adminIP, h);
+                adminMessages.Notification(adminMessages.getHouseJoinedMethod(),adminIP, h.GetID());
             } catch (IOException e){
                 System.out.println(NO_CLIENT_ERROR);
             }
@@ -129,7 +129,7 @@ public class ServerREST {
             }
             System.out.print("\n");
             try {
-                messages.HouseLeft(adminIP, h);
+                adminMessages.Notification(adminMessages.getHouseLeftMethod(),adminIP, h.GetID());
             } catch (IOException e){
                 System.out.println(NO_CLIENT_ERROR);
             }
@@ -201,9 +201,8 @@ public class ServerREST {
     @Consumes({"application/json"})
     public Response BoostRequested(String jsonID){
         int id = gson.fromJson(jsonID, int.class);
-        // trovare la maniera di riassumere tutti questi metodi
         try {
-            messages.BoostNotification(adminIP, id);
+            adminMessages.Notification(adminMessages.getBoostRequestMethod(),adminIP, id);
         } catch (IOException e){
             System.out.println(NO_CLIENT_ERROR);
         }

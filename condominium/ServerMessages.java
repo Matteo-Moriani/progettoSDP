@@ -138,36 +138,6 @@ public class ServerMessages {
         connection.getResponseCode();               // non so se serve
     }
 
-    public void HouseJoined(String adminIP, House newHouse) throws IOException{
-        URL url = new URL( adminIP+"/admin/house-joined");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-
-        connection.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-        String jsonToServer = gson.toJson(newHouse);
-        wr.writeBytes(jsonToServer);
-        wr.flush();
-        wr.close();
-        connection.getResponseCode();               // non so se serve
-    }
-
-    public void HouseLeft(String adminIP, House quittingHouse) throws IOException{
-        URL url = new URL( adminIP+"/admin/house-left");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-
-        connection.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-        String jsonToServer = gson.toJson(quittingHouse);
-        wr.writeBytes(jsonToServer);
-        wr.flush();
-        wr.close();
-        connection.getResponseCode();               // non so se serve
-    }
-
     public void Remove(String serverIP, int houseID) throws IOException{
         URL url = new URL( serverIP+"/server/remove-house");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -215,21 +185,6 @@ public class ServerMessages {
 
     public void BoostRequested(String serverIP, int houseRequestingID) throws IOException{
         URL url = new URL( serverIP+"/server/boost");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-
-        connection.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-        String jsonToServer = gson.toJson(houseRequestingID);
-        wr.writeBytes(jsonToServer);
-        wr.flush();
-        wr.close();
-        connection.getResponseCode();               // non so se serve
-    }
-
-    public void BoostNotification(String adminIP, int houseRequestingID) throws IOException{
-        URL url = new URL( adminIP+"/admin/boost");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");

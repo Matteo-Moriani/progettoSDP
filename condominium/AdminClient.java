@@ -162,25 +162,25 @@ public class AdminClient {
     @Path("house-joined")
     @POST
     @Consumes({"application/json"})
-    public Response houseJoined(String jsonHouse){
-        House h = gson.fromJson(jsonHouse, House.class);
-        System.out.print("\n      NOTIFICATION: house "+h.GetID()+" joined the condominium");
+    public Response houseJoined(String jsonID){
+        int id = gson.fromJson(jsonID, int.class);
+        System.out.print("\n      NOTIFICATION: house "+id+" joined the condominium");
         return Response.ok().build();
     }
 
     @Path("house-left")
     @POST
     @Consumes({"application/json"})
-    public Response houseLeft(String jsonHouse){
-        House h = gson.fromJson(jsonHouse, House.class);
-        System.out.print("\n      NOTIFICATION: house "+h.GetID()+" left the condominium");
+    public Response houseLeft(String jsonID){
+        int id = gson.fromJson(jsonID, int.class);
+        System.out.print("\n      NOTIFICATION: house "+id+" left the condominium");
         return Response.ok().build();
     }
 
     @Path("boost")
     @POST
     @Consumes({"application/json"})
-    public Response BoostRequested(String jsonID) throws IOException{
+    public Response BoostRequested(String jsonID){
         int id = gson.fromJson(jsonID, int.class);
         System.out.print("\n      NOTIFICATION: house "+id+" requested a boost");
         return Response.ok().build();
