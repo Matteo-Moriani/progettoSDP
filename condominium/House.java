@@ -31,12 +31,12 @@ public class House {
     private static TokenThread tokenThread;
     private static SmartMeterSimulator smartMeter;
     private List<House> housesSendingStat = new ArrayList<>();
-    private List<Integer> alertedHousesIDs = new ArrayList<>();
     private static boolean boosting;
     private static boolean quitting = false;
     private static final int TOTAL_TOKENS = 2;
     private final Object quitLock = new Object();
     private boolean newStatReady = false;
+    private String split;
 
     Gson gson;
 
@@ -47,6 +47,7 @@ public class House {
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         serverMessages = new ServerMessages();
         houseMessages = new HouseMessages();
+        split = houseMessages.getSplit();
         buffer = new HouseBuffer(this);
         boosting = false;
 
@@ -56,7 +57,7 @@ public class House {
         boolean waitingForServer = true;
         while(waitingForServer){
             try{
-                Register();
+                serverMessages.Register(serverIP, this);
                 waitingForServer = false;
                 System.out.println("connection with server established");
             } catch (IOException e){
@@ -87,7 +88,10 @@ public class House {
                 int attempt = 0;
                 while(attempt < 10) {
                     try {
-                        houseMessages.IntroduceTo(h.GetPort(), this);
+//                        houseMessages.IntroduceTo(h.GetPort(), this);
+                        houseMessages.SendMessage(
+                                houseMessages.getIntroduceMethod()+split+gson.toJson(h)+split+gson.toJson(this)
+                        );
                         break;
                     } catch (ConnectException e) {
                         System.out.println("Can't connect with house "+h.GetID()+". Trying again");
@@ -151,6 +155,8 @@ public class House {
         return port;
     }
 
+    public String getSplit(){return split;}
+
     public double GetTime(){
         long r = System.nanoTime()/100000000;
         return (double)r/10.0;
@@ -179,7 +185,10 @@ public class House {
         // mando la comunicazione di nuova stat prodotta alle altre case
         for(House h: GetList()) {
             if(h.GetID() != id)
-                houseMessages.SendNewStat(h, this);
+//                houseMessages.SendNewStat(h, this);
+                houseMessages.SendMessage(
+                        houseMessages.getNewStatMethod()+split+gson.toJson(h)+split+gson.toJson(this)
+                );
         }
         // lo dico anche a me stessa per triggerare la creazione della stat globale,
         // questo serve nel caso in cui io sia il coordinatore e l'ultima casa ad aver prodotto la stat
@@ -241,26 +250,6 @@ public class House {
         }
         housesSendingStat.clear();
         newStatReady = false;
-    }
-
-    void Register() throws IOException{
-
-        URL url = new URL( serverIP+"/server/add-house");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-
-        connection.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-        String jsonToServer = gson.toJson(this);
-        wr.writeBytes(jsonToServer);
-        wr.flush();
-        wr.close();
-//        System.out.println(connection.getResponseCode());
-        if(connection.getResponseCode() == 500){
-            System.out.println("There was already a house with my same ID");
-            System.exit(0);
-        }
     }
 
     public static void main(String[] args) throws IOException, InterruptedException{
@@ -339,7 +328,10 @@ public class House {
                     break;
                 try {
                     System.out.println("electing " + nextInRing.GetID() + " as the new coordinator");
-                    houseMessages.Elect(nextInRing);
+//                    houseMessages.Elect(nextInRing);
+                    houseMessages.SendMessage(
+                            houseMessages.getElectMethod()+split+gson.toJson(nextInRing)
+                    );
                     elected = true;
                 } catch (ConnectException e) {
                     synchronized (this){
@@ -355,7 +347,10 @@ public class House {
             while(!sent) {
                 try {
                     System.out.println("sending token before quitting");
-                    houseMessages.SendToken(nextInRing);
+//                    houseMessages.SendToken(nextInRing);
+                    houseMessages.SendMessage(
+                            houseMessages.getTokenMethod()+split+gson.toJson(nextInRing)
+                    );
                     sent = true;
                 } catch (ConnectException e) {
                     synchronized (this){
@@ -381,7 +376,10 @@ public class House {
             System.out.println("telling house " + h.GetID() + " to remove me from its list");
             while(attempt<3) {
                 try {
-                    houseMessages.Remove(h, id);
+//                    houseMessages.Remove(h, id);
+                    houseMessages.SendMessage(
+                            houseMessages.getQuitMethod()+split+gson.toJson(h)+split+gson.toJson(id)
+                    );
                     break;
                 } catch (ConnectException e) {
                     System.out.println("House "+h.GetID()+" may have quit, retrying again...");
@@ -455,21 +453,11 @@ public class House {
                     System.out.println("Next in the ring not yet initialized, ignoring the request for a new next");
                 }
                 iter.remove();
-//                houseMessages.SendConfirm(id, h);
                 System.out.println("House "+h.GetID()+" removed from my list");
                 break;
             }
         }
-//        if(leavingID!=id)
-//            printSituation();
     }
-
-//    public void AddConfirm(int alertedID){
-//        synchronized (alertedHousesIDs) {
-//            alertedHousesIDs.add(alertedID);
-//        }
-//        System.out.println("I was removed from "+alertedID+" list");
-//    }
 
     public void printSituation(){
         System.out.print("House list: ");

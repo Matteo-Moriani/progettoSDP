@@ -20,6 +20,8 @@ public class ServerMessages {
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     }
 
+
+
     List<House> AskHouseList(String IP) throws IOException {
 
         URL url = new URL( IP+"/server/list");
@@ -239,6 +241,26 @@ public class ServerMessages {
         wr.flush();
         wr.close();
         connection.getResponseCode();               // non so se serve
+    }
+
+    void Register(String serverIP, House h) throws IOException{
+
+        URL url = new URL( serverIP+"/server/add-house");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        connection.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+        String jsonToServer = gson.toJson(h);
+        wr.writeBytes(jsonToServer);
+        wr.flush();
+        wr.close();
+//        System.out.println(connection.getResponseCode());
+        if(connection.getResponseCode() == 500){
+            System.out.println("There was already a house with my same ID");
+            System.exit(0);
+        }
     }
     
 }

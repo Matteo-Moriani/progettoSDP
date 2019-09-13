@@ -16,59 +16,98 @@ public class HouseMessages {
     private final String ELECT_METHOD = "elect";
     private final String TOKEN_METHOD = "token";
     private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
-    private final String REMOVED_METHOD = "removed";
 
     public HouseMessages(){
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     }
 
-    public void IntroduceTo(int targetPort, House newHouse) throws IOException {
-        Socket socket = new Socket("localhost", targetPort);
-        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-        String message = gson.toJson(newHouse)+SPLIT+INTRODUCE_METHOD;
-        outToTarget.writeBytes(message);
-        socket.close();
+
+    public String getIntroduceMethod() {
+        return INTRODUCE_METHOD;
     }
 
-    public void Remove(House target, int quittingHouseID) throws IOException{
-        Socket socket = new Socket("localhost", target.GetPort());
-        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-        String message = gson.toJson(quittingHouseID)+SPLIT+QUIT_METHOD;
-        outToTarget.writeBytes(message);
-        socket.close();
+    public String getQuitMethod() {
+        return QUIT_METHOD;
     }
 
-    public void SendNewStat(House target, House sendingStatHouse) throws IOException{
-        Socket socket = new Socket("localhost", target.GetPort());
-        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-        String message = gson.toJson(sendingStatHouse)+SPLIT+NEW_STAT_METHOD;
-//        System.out.println("sending "+message+" from "+sendingStatHouse.GetID()+" to "+target.GetID());
-        outToTarget.writeBytes(message);
-        socket.close();
+    public String getNewStatMethod() {
+        return NEW_STAT_METHOD;
     }
 
-    public void Elect(House newCoordinator) throws IOException{
-        Socket socket = new Socket("localhost", newCoordinator.GetPort());
-        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-        String message = " "+SPLIT+ELECT_METHOD;
-        outToTarget.writeBytes(message);
-        socket.close();
+    public String getElectMethod() {
+        return ELECT_METHOD;
     }
 
-    public void SendToken(House target) throws IOException, InterruptedException{
-        Thread.sleep(1000);
-        Socket socket = new Socket("localhost", target.GetPort());
-        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-        String message = " "+SPLIT+TOKEN_METHOD;
-        outToTarget.writeBytes(message);
-        socket.close();
+    public String getTokenMethod() {
+        return TOKEN_METHOD;
     }
 
-//    public void SendConfirm(int id, House removed) throws IOException{
-//        Socket socket = new Socket("localhost", removed.GetPort());
+    public String getSplit(){
+        return SPLIT;
+    }
+
+//    public void IntroduceTo(int targetPort, House newHouse) throws IOException {
+//        Socket socket = new Socket("localhost", targetPort);
 //        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
-//        String message = gson.toJson(id)+SPLIT+REMOVED_METHOD;
+//        String message = gson.toJson(newHouse)+SPLIT+INTRODUCE_METHOD;
 //        outToTarget.writeBytes(message);
 //        socket.close();
 //    }
+//
+//    public void Remove(House target, int quittingHouseID) throws IOException{
+//        Socket socket = new Socket("localhost", target.GetPort());
+//        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+//        String message = gson.toJson(quittingHouseID)+SPLIT+QUIT_METHOD;
+//        outToTarget.writeBytes(message);
+//        socket.close();
+//    }
+//
+//    public void SendNewStat(House target, House sendingStatHouse) throws IOException{
+//        Socket socket = new Socket("localhost", target.GetPort());
+//        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+//        String message = gson.toJson(sendingStatHouse)+SPLIT+NEW_STAT_METHOD;
+//        outToTarget.writeBytes(message);
+//        socket.close();
+//    }
+//
+//    public void Elect(House newCoordinator) throws IOException{
+//        Socket socket = new Socket("localhost", newCoordinator.GetPort());
+//        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+//        String message = " "+SPLIT+ELECT_METHOD;
+//        outToTarget.writeBytes(message);
+//        socket.close();
+//    }
+//
+//    public void SendToken(House target) throws IOException, InterruptedException{
+//        Thread.sleep(1000);
+//        Socket socket = new Socket("localhost", target.GetPort());
+//        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+//        String message = " "+SPLIT+TOKEN_METHOD;
+//        outToTarget.writeBytes(message);
+//        socket.close();
+//    }
+
+    public void SendMessage(String message) throws IOException{         // gestisco nella classe house
+        String[] input = message.split((SPLIT));
+        String method = input[0];
+        String targetString = input[1];
+
+        switch (method){
+            case TOKEN_METHOD:
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                break;
+        }
+
+        House target = gson.fromJson(targetString, House.class);
+        Socket socket = new Socket("localhost", target.GetPort());
+        DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
+        outToTarget.writeBytes(message);
+        socket.close();
+    }
 }

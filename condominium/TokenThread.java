@@ -1,5 +1,8 @@
 package condominium;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 
 public class TokenThread extends Thread {
@@ -10,9 +13,13 @@ public class TokenThread extends Thread {
     private final Object tokenLock = new Object();
     private final Object boostLock = new Object();
     private static final int TOTAL_TOKENS = 2;
+    private String split;
+
+    Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public TokenThread(House house){
         this.house = house;
+        split = house.getSplit();
         if(house.GetList().size() > TOTAL_TOKENS)
             hold = false;
         else
@@ -73,7 +80,8 @@ public class TokenThread extends Thread {
         boolean sent = false;
         while(!sent) {
             try {
-                houseMessages.SendToken(h);
+//                houseMessages.SendToken(h);
+                houseMessages.SendMessage(houseMessages.getTokenMethod()+split+gson.toJson(h));
 //                System.out.println("giving my token to " + h.GetID());
                 SetHold(false);
                 sent = true;
@@ -96,7 +104,8 @@ public class TokenThread extends Thread {
                 if (house.GetList().size() > TOTAL_TOKENS){
                     // l'inoltro ha senso solo da 3 case in su
 //                    System.out.println("I already have a token, sending this one to "+house.GetNextInRing().GetID());
-                    houseMessages.SendToken(house.GetNextInRing());
+//                    houseMessages.SendToken(house.GetNextInRing());
+                    houseMessages.SendMessage(houseMessages.getTokenMethod()+split+gson.toJson(house.GetNextInRing()));
                 } else {
 //                    System.out.println("(house) waiting for more houses");
                 }
