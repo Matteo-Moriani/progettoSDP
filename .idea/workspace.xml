@@ -2,9 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="060db36a-c8d7-493d-927c-5343f04a1aec" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/condominium/AdminClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/AdminClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/condominium/House.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/House.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/condominium/HouseMessages.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/HouseMessages.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/condominium/ServerMessages.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/ServerMessages.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/condominium/ServerREST.java" beforeDir="false" afterPath="$PROJECT_DIR$/condominium/ServerREST.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/condominium/AdminClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/condominium/AdminClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/condominium/House.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/condominium/House.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/condominium/ServerMessages.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/condominium/ServerMessages.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/progettoSDP/condominium/ServerREST.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/progettoSDP/condominium/ServerREST.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,48 +29,22 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/condominium/House.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="341">
-              <caret line="281" column="56" lean-forward="true" selection-start-line="281" selection-start-column="56" selection-end-line="281" selection-end-column="56" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/condominium/ServerMessages.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="185" column="51" selection-start-line="185" selection-start-column="51" selection-end-line="185" selection-end-column="51" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/condominium/AdminMessages.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="307">
-              <caret line="87" column="49" selection-start-line="87" selection-start-column="49" selection-end-line="87" selection-end-column="49" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#458#459#0" expanded="true" />
-                <element signature="e#500#501#0" expanded="true" />
-                <element signature="e#544#545#0" expanded="true" />
-                <element signature="e#584#585#0" expanded="true" />
-                <element signature="e#631#632#0" expanded="true" />
-                <element signature="e#674#675#0" expanded="true" />
-                <element signature="e#809#891#0" />
-              </folding>
+            <state relative-caret-position="178">
+              <caret line="60" column="104" selection-start-line="60" selection-start-column="104" selection-end-line="60" selection-end-column="104" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/condominium/ServerREST.java">
+        <entry file="file://$PROJECT_DIR$/condominium/ServerMessages.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="206" column="48" lean-forward="true" selection-start-line="206" selection-start-column="48" selection-end-line="206" selection-end-column="48" />
+            <state relative-caret-position="-131">
+              <caret line="352" column="44" selection-start-line="352" selection-start-column="44" selection-end-line="352" selection-end-column="44" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#2685#2747#0" />
+                <element signature="e#14474#14521#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -70,10 +52,31 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/condominium/AdminClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="176" column="37" lean-forward="true" selection-start-line="176" selection-start-column="37" selection-end-line="176" selection-end-column="37" />
+            <state relative-caret-position="84">
+              <caret line="41" column="47" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#houseJoined#0;class#AdminClient#0" />
+                <element signature="method#houseLeft#0;class#AdminClient#0" />
+                <element signature="method#BoostRequested#0;class#AdminClient#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/condominium/ServerREST.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-90">
+              <caret line="174" column="25" selection-start-line="174" selection-start-column="25" selection-end-line="174" selection-end-column="25" />
+              <folding>
+                <element signature="method#main#0;class#ServerREST#0" />
+                <element signature="e#1460#1473#0" />
+                <element signature="method#GetHouseList#0;class#ServerREST#0" />
+                <element signature="e#1874#1889#0" />
+                <element signature="method#GetOldestHouse#0;class#ServerREST#0" />
+                <element signature="e#2138#2160#0" />
+                <element signature="method#GetNewNextHouse#0;class#ServerREST#0" />
               </folding>
             </state>
           </provider>
@@ -91,11 +94,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>nano</find>
-      <find>housesocket</find>
-      <find>condominium</find>
-      <find>quitting</find>
-      <find>printsit</find>
       <find>condominiumHouses</find>
       <find>condominiumhouses</find>
       <find>sleep</find>
@@ -114,13 +112,18 @@
       <find>asknext</find>
       <find>next</find>
       <find>gson</find>
-      <find>gson</find>
       <find>SendMessage</find>
       <find>quit</find>
-      <find>class</find>
       <find>sendmess</find>
       <find>servermessa</find>
       <find>boos</find>
+      <find>class</find>
+      <find>messagetoser</find>
+      <find>connection.setRequestProperty(&quot;Content-Type&quot;, &quot;application/json&quot;);</find>
+      <find>askoldest</find>
+      <find>asklnext</find>
+      <find>global</find>
+      <find>boostrequested</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -157,18 +160,18 @@
         <option value="$PROJECT_DIR$/condominium/Houses.java" />
         <option value="$PROJECT_DIR$/condominium/HouseMessageThread.java" />
         <option value="$PROJECT_DIR$/condominium/TokenThread.java" />
+        <option value="$PROJECT_DIR$/condominium/AdminMessages.java" />
+        <option value="$PROJECT_DIR$/condominium/ServerREST.java" />
         <option value="$PROJECT_DIR$/condominium/HouseMessages.java" />
+        <option value="$PROJECT_DIR$/condominium/AdminClient.java" />
         <option value="$PROJECT_DIR$/condominium/House.java" />
         <option value="$PROJECT_DIR$/condominium/ServerMessages.java" />
-        <option value="$PROJECT_DIR$/condominium/AdminMessages.java" />
-        <option value="$PROJECT_DIR$/condominium/AdminClient.java" />
-        <option value="$PROJECT_DIR$/condominium/ServerREST.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="675" />
-    <option name="width" value="698" />
+    <option name="width" value="699" />
     <option name="height" value="735" />
   </component>
   <component name="ProjectLevelVcsManager">
@@ -179,6 +182,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -199,8 +204,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -346,18 +349,20 @@
       <workItem from="1566982621261" duration="11177000" />
       <workItem from="1567074847136" duration="13003000" />
       <workItem from="1567174978942" duration="6146000" />
-      <workItem from="1568361880164" duration="8710000" />
+      <workItem from="1568361880164" duration="12437000" />
+      <workItem from="1568455615265" duration="6999000" />
+      <workItem from="1568474200556" duration="3303000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="253486000" />
+    <option name="totallyTimeSpent" value="267515000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4976415" visible="true" weight="0.16518219" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4976415" visible="true" weight="0.17004049" />
       <window_info id="Structure" order="1" sideWeight="0.5023585" side_tool="true" weight="0.1172466" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -366,7 +371,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.70515096" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.46714032" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39934534" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -513,44 +518,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/HouseMessageThread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="40" column="66" selection-start-line="40" selection-start-column="66" selection-end-line="40" selection-end-column="66" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/HouseMessages.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="47" column="4" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#712#794#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/House.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="341">
-          <caret line="281" column="56" lean-forward="true" selection-start-line="281" selection-start-column="56" selection-end-line="281" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/ServerMessages.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="185" column="51" selection-start-line="185" selection-start-column="51" selection-end-line="185" selection-end-column="51" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/condominium/AdminMessages.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="307">
@@ -568,20 +535,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/condominium/AdminClient.java">
+    <entry file="file://$PROJECT_DIR$/condominium/HouseMessages.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="176" column="37" lean-forward="true" selection-start-line="176" selection-start-column="37" selection-end-line="176" selection-end-column="37" />
+        <state relative-caret-position="428">
+          <caret line="102" column="67" selection-start-line="102" selection-start-column="67" selection-end-line="102" selection-end-column="67" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1089#1171#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/HouseMessageThread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="61">
+          <caret line="37" column="26" selection-start-line="37" selection-start-column="26" selection-end-line="37" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/House.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="60" column="104" selection-start-line="60" selection-start-column="104" selection-end-line="60" selection-end-column="104" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/AdminClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="84">
+          <caret line="41" column="47" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#houseJoined#0;class#AdminClient#0" />
+            <element signature="method#houseLeft#0;class#AdminClient#0" />
+            <element signature="method#BoostRequested#0;class#AdminClient#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/condominium/ServerREST.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="206" column="48" lean-forward="true" selection-start-line="206" selection-start-column="48" selection-end-line="206" selection-end-column="48" />
+        <state relative-caret-position="-90">
+          <caret line="174" column="25" selection-start-line="174" selection-start-column="25" selection-end-line="174" selection-end-column="25" />
+          <folding>
+            <element signature="method#main#0;class#ServerREST#0" />
+            <element signature="e#1460#1473#0" />
+            <element signature="method#GetHouseList#0;class#ServerREST#0" />
+            <element signature="e#1874#1889#0" />
+            <element signature="method#GetOldestHouse#0;class#ServerREST#0" />
+            <element signature="e#2138#2160#0" />
+            <element signature="method#GetNewNextHouse#0;class#ServerREST#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/condominium/ServerMessages.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-131">
+          <caret line="352" column="44" selection-start-line="352" selection-start-column="44" selection-end-line="352" selection-end-column="44" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2685#2747#0" />
+            <element signature="e#14474#14521#0" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -139,7 +139,7 @@ public class ServerREST {
             return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    @Path("get/{n}/{id}")
+    @Path("get-local/{n}/{id}")
     @GET
     @Produces({"application/json"})
     public Response GetHouseStats(@PathParam("n") int n, @PathParam("id") int id){
@@ -155,7 +155,7 @@ public class ServerREST {
         }
     }
 
-    @Path("get/{n}")
+    @Path("get-global/{n}")
     @GET
     @Produces({"application/json"})
     public Response GetGlobalStats(@PathParam("n") int n){

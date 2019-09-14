@@ -100,7 +100,7 @@ public class HouseMessages {
                     e.printStackTrace();
                 }
                 break;
-            default:
+            default:    // negli altri non c'è bisogno di aspettare
                 break;
         }
 

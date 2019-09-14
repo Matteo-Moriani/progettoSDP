@@ -10,13 +10,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 @Path("admin")
 public class AdminClient {
 
-    static ServerMessages messages = new ServerMessages();
     private static String serverIP = "http://"+ServerREST.GetHost()+":"+ServerREST.GetPort();
     private static final String clientIP = "http://localhost:111";
     private static final String HOST = "localhost";
@@ -24,6 +24,8 @@ public class AdminClient {
     private static Gson gson;
     private static final String NOT_ENOUGH_STATS_ERROR = "There aren't enough stats registered, please request a lower number.";
     private static final String FORMAT_ERROR = "Please follow the right command format";
+    static ServerMessages messages = new ServerMessages(serverIP);
+    private static String split = messages.GetSplit();
 
     public static void main(String[] args) throws InterruptedException, IOException {
         gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -36,13 +38,14 @@ public class AdminClient {
         boolean waitingForServer = true;
         while(waitingForServer){
             try {
-                messages.AddClient(serverIP, clientIP);
+//                messages.AddClient(serverIP, clientIP);
+                messages.MessageToServer(messages.AddClientMethod()+split+clientIP);
                 waitingForServer = false;
             } catch (IOException e){
+                System.out.println("waiting for server");
                 Thread.sleep(1000);
             }
         }
-
         Scanner scanner = new Scanner(System.in);
         boolean quit = false;
         while (!quit) {
@@ -67,7 +70,12 @@ public class AdminClient {
                 switch (command[0]) {
                     case "1":
                         System.out.println("house list:");
-                        List<House> houseList = messages.AskHouseList(serverIP);
+                        List<House> houseList = new ArrayList<>();
+                        String jsonArray = messages.MessageToServer(messages.AskHouseListMethod()+split+"");
+                        House[] array = gson.fromJson(jsonArray, House[].class);
+                        for(int i = 0; i<array.length; i++){
+                            houseList.add(array[i]);
+                        }
                         for(House h:houseList){
                             System.out.print(h.GetID()+" ");
                         }
@@ -76,7 +84,9 @@ public class AdminClient {
                         try {
                             n = Integer.parseInt(command[1]);
                             id = Integer.parseInt(command[2]);
-                            stats = messages.GetHouseStats(serverIP, n, id);
+//                            stats = messages.GetHouseStats(serverIP, n, id);
+                            String jsonStats = messages.MessageToServer(messages.GetHouseStatsMethod()+split+n+split+id);
+                            stats = gson.fromJson(jsonStats, Stat[].class);
                             if(stats == null){
                                 System.out.println("house " +id+ " doesn't exist");
                                 break;
@@ -92,7 +102,9 @@ public class AdminClient {
                     case "3":
                         try {
                             n = Integer.parseInt(command[1]);
-                            stats = messages.GetGlobalStats(serverIP, n);
+//                            stats = messages.GetGlobalStats(serverIP, n);
+                            String jsonStats = messages.MessageToServer(messages.GetGlobalStatsMethod()+split+n);
+                            stats = gson.fromJson(jsonStats, Stat[].class);
                             System.out.println("last " + n + " global stats:");
                             for (int i = 0; i < stats.length; i++) {
                                 System.out.println("    " + (i + 1) + ": " + stats[i].GetMean() + " (" + stats[i].getTimestamp() + ")");
@@ -105,7 +117,9 @@ public class AdminClient {
                         try {
                             n = Integer.parseInt(command[1]);
                             id = Integer.parseInt(command[2]);
-                            stats = messages.GetHouseStats(serverIP, n, id);
+//                            stats = messages.GetHouseStats(serverIP, n, id);
+                            String jsonStats = messages.MessageToServer(messages.GetHouseStatsMethod()+split+n+split+id);
+                            stats = gson.fromJson(jsonStats, Stat[].class);
                             mean = 0;
                             for (int i = 0; i < n; i++) {
                                 mean = mean + stats[i].GetMean();
@@ -125,7 +139,9 @@ public class AdminClient {
                     case "5":
                         try{
                             n = Integer.parseInt(command[1]);
-                            stats = messages.GetGlobalStats(serverIP, n);
+//                            stats = messages.GetGlobalStats(serverIP, n);
+                            String jsonStats = messages.MessageToServer(messages.GetGlobalStatsMethod()+split+n);
+                            stats = gson.fromJson(jsonStats, Stat[].class);
                             mean = 0;
                             for(int i=0; i<n; i++){
                                 mean = mean + stats[i].GetMean();
