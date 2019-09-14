@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 
-@Path("server")
+@Path("")
 public class ServerREST {
 
     private static final String HOST = "localhost";

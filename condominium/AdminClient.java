@@ -38,8 +38,7 @@ public class AdminClient {
         boolean waitingForServer = true;
         while(waitingForServer){
             try {
-//                messages.AddClient(serverIP, clientIP);
-                messages.MessageToServer(messages.AddClientMethod()+split+clientIP);
+                messages.MessageToServer(messages.AddClientMethod()+split+gson.toJson(clientIP));
                 waitingForServer = false;
             } catch (IOException e){
                 System.out.println("waiting for server");
@@ -84,7 +83,6 @@ public class AdminClient {
                         try {
                             n = Integer.parseInt(command[1]);
                             id = Integer.parseInt(command[2]);
-//                            stats = messages.GetHouseStats(serverIP, n, id);
                             String jsonStats = messages.MessageToServer(messages.GetHouseStatsMethod()+split+n+split+id);
                             stats = gson.fromJson(jsonStats, Stat[].class);
                             if(stats == null){
@@ -102,7 +100,6 @@ public class AdminClient {
                     case "3":
                         try {
                             n = Integer.parseInt(command[1]);
-//                            stats = messages.GetGlobalStats(serverIP, n);
                             String jsonStats = messages.MessageToServer(messages.GetGlobalStatsMethod()+split+n);
                             stats = gson.fromJson(jsonStats, Stat[].class);
                             System.out.println("last " + n + " global stats:");
@@ -117,19 +114,10 @@ public class AdminClient {
                         try {
                             n = Integer.parseInt(command[1]);
                             id = Integer.parseInt(command[2]);
-//                            stats = messages.GetHouseStats(serverIP, n, id);
                             String jsonStats = messages.MessageToServer(messages.GetHouseStatsMethod()+split+n+split+id);
                             stats = gson.fromJson(jsonStats, Stat[].class);
-                            mean = 0;
-                            for (int i = 0; i < n; i++) {
-                                mean = mean + stats[i].GetMean();
-                            }
-                            mean = mean / n;
-                            standardDev = 0;
-                            for (int i = 0; i < n; i++) {
-                                standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
-                            }
-                            standardDev = Math.pow(standardDev / n, 0.5);
+                            mean = CalculateMean(stats);
+                            standardDev = CalculateStandardDev(stats, mean);
                             System.out.println("mean of house " + id + " last " + n + " stats: " + mean);
                             System.out.println("standard deviation of house " + id + " last " + n + " stats: " + standardDev);
                         } catch(IOException e) {
@@ -139,19 +127,10 @@ public class AdminClient {
                     case "5":
                         try{
                             n = Integer.parseInt(command[1]);
-//                            stats = messages.GetGlobalStats(serverIP, n);
                             String jsonStats = messages.MessageToServer(messages.GetGlobalStatsMethod()+split+n);
                             stats = gson.fromJson(jsonStats, Stat[].class);
-                            mean = 0;
-                            for(int i=0; i<n; i++){
-                                mean = mean + stats[i].GetMean();
-                            }
-                            mean = mean/n;
-                            standardDev = 0;
-                            for(int i=0; i<n; i++){
-                                standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
-                            }
-                            standardDev = Math.pow(standardDev/n, 0.5);
+                            mean = CalculateMean(stats);
+                            standardDev = CalculateStandardDev(stats, mean);
                             System.out.println("mean of last "+n+" global stats: "+mean);
                             System.out.println("standard deviation of last "+n+" global stats: "+standardDev);
                         } catch(IOException e) {
@@ -173,6 +152,24 @@ public class AdminClient {
         }
         System.out.println("quitting");
         System.exit(0);
+    }
+
+    public static double CalculateMean(Stat[] stats){
+        double mean = 0;
+        for (int i = 0; i < stats.length; i++) {
+            mean = mean + stats[i].GetMean();
+        }
+        mean = mean / stats.length;
+        return mean;
+    }
+
+    public static double CalculateStandardDev(Stat[] stats, double mean){
+        double standardDev = 0;
+        for(int i=0; i < stats.length; i++){
+            standardDev = standardDev + Math.pow(stats[i].GetMean() - mean, 2);
+        }
+        standardDev = Math.pow(standardDev/stats.length, 0.5);
+        return standardDev;
     }
 
     @Path("house-joined")

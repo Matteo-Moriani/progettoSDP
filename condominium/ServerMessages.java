@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerMessages {
 
@@ -94,200 +92,6 @@ public class ServerMessages {
         connection.getResponseCode();
     }
 
-//    List<House> AskHouseList(String IP) throws IOException {
-//
-//        URL url = new URL( IP+"/server/list");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("GET");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        StringBuilder response = new StringBuilder();
-//        String line;
-//        while ((line = in.readLine()) != null) {
-//            response.append(line);
-//        }
-//        in.close();
-//
-//        House[] array = gson.fromJson(response.toString(), House[].class);
-//        List<House> list = new ArrayList();
-//        for(int i = 0; i<array.length; i++){
-//            list.add(array[i]);
-//        }
-//        return list;
-//    }
-//
-//    House AskOldest(String IP) throws IOException {
-//
-//        URL url = new URL( IP+"/server/oldest");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("GET");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        StringBuilder response = new StringBuilder();
-//        String line;
-//        while ((line = in.readLine()) != null) {
-//            response.append(line);
-//        }
-//        in.close();
-//
-//        return gson.fromJson(response.toString(), House.class);
-//    }
-//    House AskNext(String IP, House inNeed) throws IOException {
-//
-//        int leavingID = inNeed.GetID();
-//        URL url = new URL( IP+"/server/new-next/"+leavingID);
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("GET");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        StringBuilder response = new StringBuilder();
-//        String line;
-//        while ((line = in.readLine()) != null) {
-//            response.append(line);
-//        }
-//        in.close();
-//
-//        return gson.fromJson(response.toString(), House.class);
-//    }
-//
-//    Stat[] GetHouseStats(String serverIP, int quantity, int houseID) throws IOException {
-//
-//        URL url = new URL( serverIP+"/server/get-local/"+quantity+"/"+houseID);
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("GET");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        StringBuilder response = new StringBuilder();
-//        String line;
-//        while ((line = in.readLine()) != null) {
-//            response.append(line);
-//        }
-//        in.close();
-//
-//        if(response == null)
-//            return null;
-//        Stat[] stats = gson.fromJson(response.toString(), Stat[].class);
-//        return stats;
-//    }
-//
-//    Stat[] GetGlobalStats(String serverIP, int quantity) throws IOException {
-//
-//        URL url = new URL( serverIP+"/server/get-global/"+quantity);
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("GET");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        StringBuilder response = new StringBuilder();
-//        String line;
-//        while ((line = in.readLine()) != null) {
-//            response.append(line);
-//        }
-//        in.close();
-//
-//        Stat[] stats = gson.fromJson(response.toString(), Stat[].class);
-//        return stats;
-//    }
-//
-//    public void AddClient(String serverIP, String clientIP) throws IOException{
-//        URL url = new URL( serverIP+"/server/add-client");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("POST");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        connection.setDoOutput(true);
-//        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//        String jsonToServer = gson.toJson(clientIP);
-//        wr.writeBytes(jsonToServer);
-//        wr.flush();
-//        wr.close();
-//        connection.getResponseCode();               // non so se serve
-//    }
-//
-//    public void Remove(String serverIP, int houseID) throws IOException{
-//        URL url = new URL( serverIP+"/server/remove-house");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("DELETE");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        connection.setDoOutput(true);
-//        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//        String jsonToServer = gson.toJson(houseID);
-//        wr.writeBytes(jsonToServer);
-//        wr.flush();
-//        wr.close();
-//        connection.getResponseCode();               // non so se serve
-//    }
-//
-//    public void SendNewLocalStat(String serverIP, House h) throws IOException{
-//        URL url = new URL( serverIP+"/server/new-stat/local");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("POST");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        connection.setDoOutput(true);
-//        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//        String jsonToServer = gson.toJson(h);
-//        wr.writeBytes(jsonToServer);
-//        wr.flush();
-//        wr.close();
-//        connection.getResponseCode();               // non so se serve
-//    }
-//
-//    public void SendNewGlobalStat(String serverIP, Stat s) throws IOException{
-//        URL url = new URL( serverIP+"/server/new-stat/global");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("POST");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        connection.setDoOutput(true);
-//        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//        String jsonToServer = gson.toJson(s);
-//        wr.writeBytes(jsonToServer);
-//        wr.flush();
-//        wr.close();
-//        connection.getResponseCode();               // non so se serve
-//    }
-//
-//    public void BoostRequested(String serverIP, int houseRequestingID) throws IOException{
-//        URL url = new URL( serverIP+"/server/boost");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("POST");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        connection.setDoOutput(true);
-//        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//        String jsonToServer = gson.toJson(houseRequestingID);
-//        wr.writeBytes(jsonToServer);
-//        wr.flush();
-//        wr.close();
-//        connection.getResponseCode();               // non so se serve
-//    }
-//
-//    public void Register(String serverIP, House h) throws IOException{
-//
-//        URL url = new URL( serverIP+"/server/add-house");
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("POST");
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        connection.setDoOutput(true);
-//        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//        String jsonToServer = gson.toJson(h);
-//        wr.writeBytes(jsonToServer);
-//        wr.flush();
-//        wr.close();
-////        System.out.println(connection.getResponseCode());
-//        if(connection.getResponseCode() == 500){
-//            System.out.println("There was already a house with my same ID");
-//            System.exit(0);
-//        }
-//    }
-
     public String MessageToServer(String message) throws IOException{
         String responseToHouse = "";
 
@@ -296,13 +100,12 @@ public class ServerMessages {
         String quantity;
         String id;
         String jsonHouse;
-        String content;
+        String jsonContent;
 
-        String urlBase = serverIP+"/server/"+method;
+        String urlBase = serverIP+"/"+method;
         URL url = new URL( urlBase);
         HttpURLConnection connection;
         StringBuilder response;
-        DataOutputStream d;
 
         switch (method){
             case ASK_HOUSE_LIST_METHOD:
@@ -351,13 +154,13 @@ public class ServerMessages {
             case BOOST_REQUESTED_METHOD:
             case SEND_NEW_GLOBAL_STAT_METHOD:
             case SEND_NEW_LOCAL_STAT_METHOD:
-                content = input[1];
+                jsonContent = input[1];
 
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestMethod("POST");
 
-                SendContent(content,connection);
+                SendContent(jsonContent,connection);
                 break;
             case REMOVE_METHOD:
                 id = input[1];
@@ -368,33 +171,6 @@ public class ServerMessages {
 
                 SendContent(id,connection);
                 break;
-//            case SEND_NEW_GLOBAL_STAT_METHOD:
-//                String jsonStat = input[1];
-//
-//                connection = (HttpURLConnection) url.openConnection();
-//                connection.setRequestProperty("Content-Type", "application/json");
-//                connection.setRequestMethod("POST");
-//
-//                SendContent(jsonStat,connection);
-//                break;
-//            case SEND_NEW_LOCAL_STAT_METHOD:
-//                jsonHouse = input[1];
-//
-//                connection = (HttpURLConnection) url.openConnection();
-//                connection.setRequestProperty("Content-Type", "application/json");
-//                connection.setRequestMethod("POST");
-//
-//                SendContent(jsonHouse,connection);
-//                break;
-//            case BOOST_REQUESTED_METHOD:
-//                id = input[1];
-//
-//                connection = (HttpURLConnection) url.openConnection();
-//                connection.setRequestProperty("Content-Type", "application/json");
-//                connection.setRequestMethod("POST");
-//
-//                SendContent(id,connection);
-//                break;
             case REGISTER_METHOD:
                 jsonHouse = input[1];
 

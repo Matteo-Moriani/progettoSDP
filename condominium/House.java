@@ -57,7 +57,6 @@ public class House {
         boolean waitingForServer = true;
         while(waitingForServer){
             try{
-//                serverMessages.Register(serverIP, this);
                 serverMessages.MessageToServer(serverMessages.RegisterMethod()+split+gson.toJson(this));
                 waitingForServer = false;
                 System.out.println("connection with server established");
@@ -68,7 +67,6 @@ public class House {
         }
 
         // 2 - ricevo la lista di case
-//        houseList = serverMessages.AskHouseList(serverIP);
         String jsonArray = serverMessages.MessageToServer(serverMessages.AskHouseListMethod());
         House[] array = gson.fromJson(jsonArray, House[].class);
         for(int i = 0; i<array.length; i++){
@@ -132,7 +130,6 @@ public class House {
 //            System.out.println("(DEBUG) fai uscire ora la casa");
 //            Thread.sleep(5000);
 
-//            nextInRing = serverMessages.AskOldest(serverIP);
             String nextInRingJson = serverMessages.MessageToServer(serverMessages.AskOldestMethod());
             nextInRing = gson.fromJson(nextInRingJson, House.class);
 
@@ -204,7 +201,6 @@ public class House {
         // questo serve nel caso in cui io sia il coordinatore e l'ultima casa ad aver prodotto la stat
         NewStatFromHouse(this);
         // e poi mando al server
-//        serverMessages.SendNewLocalStat(serverIP, this);
         serverMessages.MessageToServer(serverMessages.SendNewLocalStatMethod()+split+gson.toJson(this));
     }
 
@@ -257,7 +253,6 @@ public class House {
         if(coordinator){
             System.out.println("sending the last global stat to the server");
             Stat globalStat = new Stat(sum, sendingStat.GetLastStat().getTimestamp());
-//            serverMessages.SendNewGlobalStat(serverIP, globalStat);
             serverMessages.MessageToServer(serverMessages.SendNewGlobalStatMethod()+split+gson.toJson(globalStat));
         }
         housesSendingStat.clear();
@@ -290,7 +285,6 @@ public class House {
                         if (!tokenThread.BoostRequested()) {
                             System.out.println("requesting boost, waiting for a token");
                             tokenThread.SetWantsBoost(true);
-//                            serverMessages.BoostRequested(serverIP, id);
                             serverMessages.MessageToServer(serverMessages.BoostRequestedMethod()+split+id);
                             synchronized (tokenThread) {
                                 tokenThread.notify();
@@ -382,7 +376,6 @@ public class House {
         temp.addAll(GetList());
 
         // mi serve rimuovere prima la casa dal server e poi dalle case per askNewNext
-//        serverMessages.Remove(serverIP, id);
         serverMessages.MessageToServer(serverMessages.RemoveMethod()+split+id);
         for (House h : temp) {
 //            Thread.sleep(5000);
@@ -439,10 +432,6 @@ public class House {
                     nextInRing = h;
                     System.out.println("new next in ring: " + nextInRing.GetID());
                 }
-//                if (serverMessages.AskHouseList(serverIP).get(GetList().size() - 2).GetID() == id) {
-//                    nextInRing = h;
-//                    System.out.println("new next in ring: " + nextInRing.GetID());
-//                }
             }catch(IOException e){
                 e.printStackTrace();
             }
@@ -468,7 +457,6 @@ public class House {
                         // mettiamoci tanto a capire che il next sta uscendo
 //                        try { Thread.sleep(10000); } catch(InterruptedException e){ e.printStackTrace(); }
 
-//                        nextInRing = serverMessages.AskNext(serverIP, this);
                         String houseJson = serverMessages.MessageToServer(
                                 serverMessages.AskNextMethod()+split+id);
                          nextInRing = gson.fromJson(houseJson, House.class);
