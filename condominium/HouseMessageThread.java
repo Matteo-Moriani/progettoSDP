@@ -11,14 +11,15 @@ public class HouseMessageThread extends Thread{
 
     Socket socket;
     House house;
+    TokenThread tokenThread;
     Gson gson = new GsonBuilder().create();
-//    private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
     private String split;
 
     public HouseMessageThread(Socket socket, House house){
         this.socket = socket;
         this.house = house;
         split = house.getSplit();
+        tokenThread = house.GetTokenThread();
 
         start();
     }
@@ -45,11 +46,11 @@ public class HouseMessageThread extends Thread{
                     house.SetCoordinator();
                     break;
                 case "token":
-                    try {
-                        house.GetTokenThread().SetHold(true);
-                    } catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
+                    tokenThread.SetHold(true);
+                    break;
+                case "ok":
+                    int ConfirmingID = gson.fromJson(input[2], int.class);
+                    house.ReceiveConfirmation(ConfirmingID);
                     break;
                 default:
                     System.out.println("there's something wrong with the message");

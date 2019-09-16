@@ -15,6 +15,7 @@ public class HouseMessages {
     private final String NEW_STAT_METHOD = "new-stat";
     private final String ELECT_METHOD = "elect";
     private final String TOKEN_METHOD = "token";
+    private final String OK_METHOD = "ok";
     private final String SPLIT = "SEPARATOR-FOR-MESSAGES";
 
     public HouseMessages(){
@@ -22,24 +23,28 @@ public class HouseMessages {
     }
 
 
-    public String getIntroduceMethod() {
+    public String IntroduceMethod() {
         return INTRODUCE_METHOD;
     }
 
-    public String getQuitMethod() {
+    public String QuitMethod() {
         return QUIT_METHOD;
     }
 
-    public String getNewStatMethod() {
+    public String NewStatMethod() {
         return NEW_STAT_METHOD;
     }
 
-    public String getElectMethod() {
+    public String ElectMethod() {
         return ELECT_METHOD;
     }
 
-    public String getTokenMethod() {
+    public String SendTokenMethod() {
         return TOKEN_METHOD;
+    }
+
+    public String OkMethod(){
+        return OK_METHOD;
     }
 
     public String getSplit(){
@@ -49,21 +54,23 @@ public class HouseMessages {
     public void SendMessage(String message) throws IOException{         // gestisco nella classe house
         String[] input = message.split((SPLIT));
         String method = input[0];
-        String targetString = input[1];
+        String targetJson = input[1];
+        House target = gson.fromJson(targetJson, House.class);
 
+        // alla fine uno switch non serviva, ma lo tengo giusto per rallentare il giro dei token per il debug
         switch (method){
             case TOKEN_METHOD:
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e){
-                    e.printStackTrace();
-                }
+//                System.out.println("sending to "+target.GetID());
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e){
+//                    e.printStackTrace();
+//                }
                 break;
             default:    // negli altri non c'è bisogno di aspettare
                 break;
         }
 
-        House target = gson.fromJson(targetString, House.class);
         Socket socket = new Socket("localhost", target.GetPort());
         DataOutputStream outToTarget = new DataOutputStream(socket.getOutputStream());
         outToTarget.writeBytes(message);

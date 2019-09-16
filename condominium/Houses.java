@@ -37,14 +37,11 @@ public class Houses {
         House newNext = houseList.get(0);
         while(iter.hasNext()){
             House h = iter.next();
-//            System.out.println("checking if "+h.GetID()+" is equal to "+leavingID);
             if(h.GetID() == houseInNeed){
-//                System.out.println("found "+houseInNeed+" at index "+houseList.indexOf(h));
                 //se non stiamo parlando dell'ultima nell'anello
                 if(houseList.indexOf(h) != houseList.size()-1)
                     index = houseList.indexOf(h)+1;
                 newNext = houseList.get(index);
-//                RemoveHouse(h);
                 break;
             }
         }
@@ -73,7 +70,6 @@ public class Houses {
 
     public void AddGlobalStat(Stat s){
         globalStats.add(s);
-//        System.out.println("global stats available: "+globalStats.size());
     }
 
     public Stat[] GetLocalStats(int requestedQuantity, int houseID){

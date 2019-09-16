@@ -6,9 +6,7 @@ import com.google.gson.annotations.Expose;
 import simulation_src_2019.SmartMeterSimulator;
 import java.io.*;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.ServerSocket;
-import java.net.URL;
 import java.util.*;
 
 public class House {
@@ -21,23 +19,22 @@ public class House {
     private Stat lastStat;
 
     private static boolean coordinator;
-    private static House nextInRing;
+    private House nextInRing;
     private static String serverIP;
-    private static List<House> houseList = new ArrayList<>();
+    private List<House> houseList = new ArrayList<>();
     private static HouseBuffer buffer;
     private static ServerMessages serverMessages;
     private static HouseMessages houseMessages;
-    private static HouseSocketThread houseSocket;
-    private static TokenThread tokenThread;
+    private HouseSocketThread houseSocket;
+    private TokenThread tokenThread;
     private static SmartMeterSimulator smartMeter;
     private List<House> housesSendingStat = new ArrayList<>();
     private static boolean boosting;
-    private static boolean quitting = false;
+    private static boolean staticQuitting = false;
     private static final int TOTAL_TOKENS = 2;
-    private final Object quitLock = new Object();
     private boolean newStatReady = false;
     private static String split;
-
+    private HashMap<Integer,Boolean> confirmations = new HashMap();
     Gson gson;
 
     public House(int houseID, int housePort, int serverPort, String serverHost) throws IOException, InterruptedException{
@@ -80,7 +77,7 @@ public class House {
         System.out.println("smart meter running");
 
         // 4 - mi metto in ascolto, tra subito dopo l'arrivo della lista e subito prima che mi metto in ascolto
-        // qualcuno esce, lo scoperirò nel presentarmi a chi è uscito
+        // qualcuno esce, lo scoprirò nel presentarmi a chi è uscito
 //        Thread.sleep(10000);
         ServerSocket socket = new ServerSocket(port);
         houseSocket = new HouseSocketThread(socket, this);
@@ -94,7 +91,7 @@ public class House {
                     try {
 //                        houseMessages.IntroduceTo(h.GetPort(), this);
                         houseMessages.SendMessage(
-                                houseMessages.getIntroduceMethod()+split+gson.toJson(h)+split+gson.toJson(this)
+                                houseMessages.IntroduceMethod()+split+gson.toJson(h)+split+gson.toJson(this)
                         );
                         break;
                     } catch (ConnectException e) {
@@ -104,7 +101,7 @@ public class House {
                     }
                 }
                 if(attempt == 3) {
-                    System.out.println("I was unable to introduce myself to "+h.GetID()+". Removing it from my list");
+                    System.out.println("House "+h.GetID()+" has left while introducing myself to it. Removing it from my list");
                     synchronized (houseList) {
                         houseList.remove(h);
                     }
@@ -164,8 +161,8 @@ public class House {
 
     public String getSplit(){return split;}
 
-    public double GetTime(){
-        long r = System.nanoTime()/100000000;
+    public double GetTime(long timestamp){
+        long r = timestamp/100000000;
         return (double)r/10.0;
     }
 
@@ -188,13 +185,13 @@ public class House {
     public void AskLastStat(Stat lastStat) throws IOException{
         this.lastStat = lastStat;
         newStatReady = true;
-        System.out.println("+++ mean produced: "+lastStat.GetMean()+" ("+lastStat.getTimestamp()+") +++");
+        System.out.println("mean produced: "+lastStat.GetMean()+" ("+lastStat.getTimestamp()+")");
         // mando la comunicazione di nuova stat prodotta alle altre case
         for(House h: GetList()) {
             if(h.GetID() != id)
 //                houseMessages.SendNewStat(h, this);
                 houseMessages.SendMessage(
-                        houseMessages.getNewStatMethod()+split+gson.toJson(h)+split+gson.toJson(this)
+                        houseMessages.NewStatMethod()+split+gson.toJson(h)+split+gson.toJson(this)
                 );
         }
         // lo dico anche a me stessa per triggerare la creazione della stat globale,
@@ -206,12 +203,6 @@ public class House {
 
     public Stat GetLastStat(){
         return lastStat;
-    }
-
-    public boolean IsQuitting(){
-        synchronized (quitLock) {
-            return quitting;
-        }
     }
 
     public synchronized void NewStatFromHouse(House sendingStat) throws IOException{
@@ -249,11 +240,13 @@ public class House {
         }
         sum = sum + lastStat.GetMean();
 
-        System.out.println(">>> total consumes: "+sum+" ("+sendingStat.GetLastStat().getTimestamp()+") <<<\n");
+        System.out.println("total consumes: "+sum+" ("+sendingStat.GetLastStat().getTimestamp()+")");
         if(coordinator){
-            System.out.println("sending the last global stat to the server");
+            System.out.println(">>> sending the last global stat to the server <<<\n");
             Stat globalStat = new Stat(sum, sendingStat.GetLastStat().getTimestamp());
             serverMessages.MessageToServer(serverMessages.SendNewGlobalStatMethod()+split+gson.toJson(globalStat));
+        } else {
+            System.out.println();
         }
         housesSendingStat.clear();
         newStatReady = false;
@@ -261,16 +254,16 @@ public class House {
 
     public static void main(String[] args) throws IOException, InterruptedException{
 
-        int id = (int)(Math.random()*900+101);          // sempre 3 cifre
-        int port = (int)(Math.random()*64535+1001);     // sempre 4 cifre
+        int id = (int)(Math.random()*900+100);          // sempre 3 cifre
+        int port = (int)(Math.random()*64535+1000);     // sempre 4 cifre
         House myself = new House(id, port, ServerREST.GetPort(), ServerREST.GetHost());
 
         Scanner scanner = new Scanner(System.in);
-        while (!quitting) {
+        while (!staticQuitting) {
             System.out.println("\nCommands available:");
             System.out.println("1: quit");
             System.out.println("2: request boost");
-            System.out.print("choose a command and press return:\n\n\n");
+            System.out.print("choose a command and press return:\n\n");
 
             String input = "";
             input = scanner.nextLine();
@@ -281,20 +274,7 @@ public class House {
                     myself.Quit();
                     break;
                 case "2":
-                    if(!quitting) {
-                        if (!tokenThread.BoostRequested()) {
-                            System.out.println("requesting boost, waiting for a token");
-                            tokenThread.SetWantsBoost(true);
-                            serverMessages.MessageToServer(serverMessages.BoostRequestedMethod()+split+id);
-                            synchronized (tokenThread) {
-                                tokenThread.notify();
-                            }
-                        } else {
-                            System.out.println("boost request already pending");
-                        }
-                    } else {
-                        System.out.println("I'm quitting, boost request refused");
-                    }
+                    myself.Boost();
                     break;
                 default:
                     System.out.println("Input '" + input + "' not valid.");
@@ -307,11 +287,27 @@ public class House {
         System.exit(0);
     }
 
-    public void Quit() throws IOException, InterruptedException{
-        // 1 - i thread token e houseSocket escono dai loro cicli while, chiudo subito lo smart meter
-        synchronized (quitLock) {
-            quitting = true;
+    public void Boost() throws IOException{
+        if(!staticQuitting) {
+            if (!tokenThread.BoostRequested()) {
+                System.out.println("boost requested");
+                tokenThread.SetWantsBoost(true);
+                serverMessages.MessageToServer(serverMessages.BoostRequestedMethod()+split+id);
+                synchronized (tokenThread) {
+                    tokenThread.notify();
+                }
+            } else {
+                System.out.println("boost request already pending");
+            }
+        } else {
+            System.out.println("I'm quitting, boost request refused");
         }
+    }
+
+    public void Quit() throws IOException, InterruptedException{
+        // 1 - non accetto più input da parte dell'utente
+        staticQuitting = true;
+
         System.out.println("quitting...");
         smartMeter.stopMeGently();
         System.out.println("smart meter stopped");
@@ -322,56 +318,15 @@ public class House {
             System.out.println("deleting pending boost request");
         }
 
-        // 3 - gestisco coordinatore e token e poi mi cancello ora dalle liste perché poi andrò in wait
-        // voglio che si cancellino dalle liste una alla volta
-        // se ero il coordinatore eleggo il mio next
+        // 3 - gestisco coordinatore
         if (coordinator) {
-            // provare uscita contemporanea coordinatore e suo next
-//            Thread.sleep(10000);
-            boolean elected = false;
-            while(!elected) {
-                // se sarei io quello da eleggere, allora non importa
-                if(nextInRing.GetID() == id)
-                    break;
-                try {
-                    System.out.println("electing " + nextInRing.GetID() + " as the new coordinator");
-//                    houseMessages.Elect(nextInRing);
-                    houseMessages.SendMessage(
-                            houseMessages.getElectMethod()+split+gson.toJson(nextInRing)
-                    );
-                    elected = true;
-                } catch (ConnectException e) {
-                    synchronized (this){
-                        System.out.println("my next quit. waiting for a new next to elect");
-                        wait();
-                    }
-                }
-            }
-        }
-        // se avevo un token e rimangono almeno altre due case, lo mando al mio next
-        if (tokenThread.HoldingToken() && GetList().size() >= TOTAL_TOKENS) {
-            boolean sent = false;
-            while(!sent) {
-                try {
-                    System.out.println("sending token before quitting");
-//                    houseMessages.SendToken(nextInRing);
-                    houseMessages.SendMessage(
-                            houseMessages.getTokenMethod()+split+gson.toJson(nextInRing)
-                    );
-                    sent = true;
-                } catch (ConnectException e) {
-                    synchronized (this){
-                        System.out.println("my next quit. waiting for a new next to send my token to");
-                        wait();
-                    }
-                }
-            }
+            Elect();
         }
 
+        // 4 - esco dalle liste, voglio che si cancellino dalle liste una alla volta
         synchronized (houseList) {
             houseList.remove(this);
         }
-
         List<House> temp = new ArrayList<>();
         temp.addAll(GetList());
 
@@ -383,9 +338,8 @@ public class House {
             System.out.println("telling house " + h.GetID() + " to remove me from its list");
             while(attempt<3) {
                 try {
-//                    houseMessages.Remove(h, id);
                     houseMessages.SendMessage(
-                            houseMessages.getQuitMethod()+split+gson.toJson(h)+split+gson.toJson(id)
+                            houseMessages.QuitMethod()+split+gson.toJson(h)+split+gson.toJson(id)
                     );
                     break;
                 } catch (ConnectException e) {
@@ -398,19 +352,86 @@ public class House {
                 System.out.println("House "+h.GetID()+" have quit, moving on");
         }
 
-        //4 - se stavo boostando, faccio finire così poi mando il token al next
+        WaitForConfirmations();
+
+        // 5 - i thread token e houseSocket escono dai loro cicli while, aspetto un paio di secondi
+        // in caso di messaggi particolarmente in ritardo
+        tokenThread.setQuitting(true);
+        houseSocket.setQuitting(true);
+        Thread.sleep(2000);
+
+        // 6 - se avevo un token e rimangono almeno altre due case, lo mando al mio next
+        if (tokenThread.HoldingToken() && GetList().size() >= TOTAL_TOKENS) {
+            boolean sent = false;
+            while(!sent) {
+                try {
+                    System.out.println("sending token before quitting");
+                    houseMessages.SendMessage(
+                            houseMessages.SendTokenMethod()+split+gson.toJson(nextInRing)
+                    );
+                    sent = true;
+                } catch (ConnectException e) {
+                    synchronized (this){
+                        System.out.println("my next quit. waiting for a new next to send my token to");
+                        wait();
+                    }
+                }
+            }
+        }
+
+        // 7 - se stavo boostando, faccio finire così poi mando il token al next
         while (boosting) {
             synchronized (this) {
                 System.out.println("waiting boost to end to release and pass the token");
                 wait();
-                System.out.println("boost ended and token sent");
             }
         }
     }
 
-    public void AddHouse(House h){
+    private void WaitForConfirmations(){
+        for(House h : houseList){
+            if(h.GetID() != id)
+                confirmations.put(h.GetID(), false);
+        }
+        if(confirmations.size()!=0) {
+            try {
+                System.out.println("waiting for everyone to remove me from their list");
+                synchronized (this) {
+                    wait();
+                }
+                System.out.println("I was removed from everyone's list");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void CheckConfirmations(){
+        if(confirmations.size() != 0){
+            boolean everyoneConfirmed = true;
+            for(boolean b : confirmations.values()){
+                if(b == false){
+                    everyoneConfirmed = false;
+                }
+            }
+            if(everyoneConfirmed){
+                synchronized (this){
+                    notify();
+                }
+            }
+        }
+    }
+
+    public void AddHouse(House h) throws IOException{
         // controllo non ci sia già la casa in questione. può capitare se si presenta dopo che ho ricevuto
         // una lista di case già aggiornata
+        if(staticQuitting){
+            if(!confirmations.containsKey(h.GetID())){
+                confirmations.put(h.GetID(),false);
+            }
+            houseMessages.SendMessage(houseMessages.QuitMethod()+split+gson.toJson(h)+split+gson.toJson(id));
+        }
+
         boolean alreadyPresent = false;
         for(House i:GetList()){
             if(i.GetID() == h.GetID())
@@ -453,17 +474,27 @@ public class House {
             if(h.GetID() == leavingID){
                 // che succede se una casa va via quando non ho ancora un next? salto la ricerca del prossimo next
                 try {
-                    if (nextInRing.GetID() == leavingID) {
+                    if (nextInRing.GetID() == leavingID && leavingID != id) {
                         // mettiamoci tanto a capire che il next sta uscendo
 //                        try { Thread.sleep(10000); } catch(InterruptedException e){ e.printStackTrace(); }
 
-                        String houseJson = serverMessages.MessageToServer(
-                                serverMessages.AskNextMethod()+split+id);
-                         nextInRing = gson.fromJson(houseJson, House.class);
-
-                        System.out.println("My next was removed, new next is " + nextInRing.GetID());
-                        synchronized (this){
-                            notify();
+                        int attempts = 0;
+                        while(attempts<3) {
+                            try {
+                                String houseJson = serverMessages.MessageToServer(serverMessages.AskNextMethod() + split + id);
+                                nextInRing = gson.fromJson(houseJson, House.class);
+                                break;
+                            } catch (IOException e) {
+                                System.out.println("couldn't find a next in the ring, retrying...");
+                                attempts++;
+                                try { Thread.sleep(500); } catch(InterruptedException e1){ e1.printStackTrace(); }
+                            }
+                        }
+                        if(attempts != 3){
+                            System.out.println("My next was removed, new next is " + nextInRing.GetID());
+                            synchronized (this) {
+                                notify();
+                            }
                         }
                     }
                 } catch(NullPointerException e){
@@ -471,6 +502,15 @@ public class House {
                 }
                 iter.remove();
                 System.out.println("House "+h.GetID()+" removed from my list");
+                if(confirmations.size() != 0) {
+                    confirmations.remove(leavingID);
+                    CheckConfirmations();
+                }
+
+                houseMessages.SendMessage(houseMessages.OkMethod()+split+gson.toJson(h)+split+gson.toJson(id));
+                if(h.GetID() != id)
+                    System.out.println("Confirmed to house "+h.GetID()+" I removed it from my list");
+
                 break;
             }
         }
@@ -488,8 +528,43 @@ public class House {
     }
 
     public void SetCoordinator(){
-        coordinator = true;
-        System.out.println("now I am the coordinator");
+        if(!staticQuitting) {
+            coordinator = true;
+            System.out.println("\n+++ I was elected as the new coordinator +++\n");
+        } else {
+            Elect();
+        }
+    }
+
+    public void ReceiveConfirmation(int id){
+        confirmations.replace(id, true);
+        CheckConfirmations();
+        System.out.println("I was removed from "+id+" list.");
+    }
+
+    public void Elect(){
+        // provare uscita contemporanea coordinatore e suo next
+//            Thread.sleep(10000);
+        boolean elected = false;
+        while(!elected) {
+            // se sarei io quello da eleggere, allora non importa
+            if(nextInRing.GetID() == id)
+                break;
+            try {
+                System.out.println("electing " + nextInRing.GetID() + " as the new coordinator");
+                houseMessages.SendMessage(
+                        houseMessages.ElectMethod()+split+gson.toJson(nextInRing)
+                );
+                elected = true;
+            } catch (IOException e) {                   // prima era solo ConnectException
+                synchronized (this){
+                    System.out.println("my next quit. waiting for a new next to elect");
+                    try {
+                        wait();
+                    } catch (InterruptedException e1){e1.printStackTrace();}
+                }
+            }
+        }
     }
 
 }
