@@ -80,8 +80,9 @@ public class House {
 
         // 4 - mi metto in ascolto, tra subito dopo l'arrivo della lista e subito prima che mi metto in ascolto
         // qualcuno esce, lo scoprirò nel presentarmi a chi è uscito
-//        System.out.println("------- sleeping for 10 seconds. quit now with another house");
-//        Thread.sleep(10000);
+
+//        System.out.println("------- sleeping for 8 seconds.");
+//        Thread.sleep(8000);
 
         ServerSocket socket = new ServerSocket(port);
         houseSocket = new HouseSocketThread(socket, this);
@@ -127,6 +128,7 @@ public class House {
         // controllo se il next che mi arriva sia effettivamente tra le case in lista, se non lo è ne chiedo un altro.
 
         boolean validNext = false;
+        int attempts = 0;
         while(!validNext){
             String nextInRingJson = serverMessages.MessageToServer(serverMessages.AskOldestMethod());
             nextInRing = gson.fromJson(nextInRingJson, House.class);
@@ -139,9 +141,12 @@ public class House {
                 }
             }
             if(!validNext) {
+                attempts++;
                 System.out.println("next in ring received from server have left the condominium. asking again to server");
                 Thread.sleep(500);
             }
+            if(attempts == 10)
+                System.out.println("ERROR: too many attempts, some thread is taking too long to execute");
         }
 
         tokenThread.start();

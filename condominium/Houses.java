@@ -22,11 +22,11 @@ public class Houses {
         return instance;
     }
 
-    public synchronized List<House> GetHouseList() { // prendo copia lista
+    public List<House> GetHouseList() { // prendo copia lista
         return new ArrayList<>(houseList);
     }
 
-    public synchronized House GetOldest(){
+    public House GetOldest(){
         return oldest;
     }
 
@@ -48,14 +48,14 @@ public class Houses {
         return newNext;
     }
 
-    public synchronized void AddHouse(House h){
+    public void AddHouse(House h){
         houseList.add(h);
         houseStats.put(h.GetID(), new ArrayList<>());
         if(houseList.size() == 1)
             oldest = h;
     }
 
-    public synchronized void RemoveHouse(House h){
+    public void RemoveHouse(House h){
         houseList.remove(h);
         houseStats.remove(h);
         if(h.GetID() == oldest.GetID())
