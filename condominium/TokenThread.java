@@ -2,6 +2,7 @@ package condominium;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 
 public class TokenThread extends Thread {
@@ -37,12 +38,12 @@ public class TokenThread extends Thread {
             if (HoldingToken()) {
                 if (BoostRequested()) {
                     try {
-                        System.out.println("boost started, keeping the token "+house.GetTime(System.nanoTime()));
-                        System.out.println("\nboosting...\n");
+                        System.out.println("\n      boost started, keeping the token "+house.GetTime(System.nanoTime())+"\n");
+                        System.out.println("\n      boosting...\n");
                         house.SetBoosting(true);
                         house.GetSmartMeter().boost();
                         SetWantsBoost(false);
-                        System.out.println("boost ended, releasing the token "+house.GetTime(System.nanoTime())+"\n");
+                        System.out.println("\n      boost ended, releasing the token "+house.GetTime(System.nanoTime())+"\n");
                         house.SetBoosting(false);
 
                         if (house.GetList().size() > TOTAL_TOKENS) {
@@ -53,7 +54,7 @@ public class TokenThread extends Thread {
                                     break;
                                 } catch (IOException connect){
                                     System.out.println("I wasn't unable to send the token to "
-                                            +house.GetNextInRing().GetID() + ". trying again...");
+                                            +house.GetNextInRing().GetID() + " after boost. trying again...");
                                     attempts++;
                                     Thread.sleep(500);
                                 }
@@ -90,7 +91,7 @@ public class TokenThread extends Thread {
                     if(!HouseQuitting()) {
                         synchronized (this) {
                             try {
-                                System.out.println("waiting for more houses");
+                                System.out.println("waiting for more houses to cycle tokens");
                                 wait();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -126,7 +127,17 @@ public class TokenThread extends Thread {
                 } else {
                     if(cyclingDebugger)
                         System.out.println("I already have a token, sending this one to " + house.GetNextInRing().GetID());
-                    houseMessages.SendMessage(houseMessages.SendTokenMethod() + split + gson.toJson(house.GetNextInRing()));
+                    boolean sent = false;
+                    while(!sent) {
+                        try {
+                            houseMessages.SendMessage(houseMessages.SendTokenMethod() + split + gson.toJson(house.GetNextInRing()));
+                            sent = true;
+                        } catch (NullPointerException e) {
+                            System.out.println("next not set yet, keeping also this token while waiting");
+                            try {Thread.sleep(500);} catch (InterruptedException e1){e1.printStackTrace();}
+                        }
+                    }
+
                 }
             }
         } else {

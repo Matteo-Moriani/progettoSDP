@@ -35,6 +35,7 @@ public class House {
     private boolean newStatReady = false;
     private static String split;
     private HashMap<Integer,Boolean> confirmations = new HashMap();
+    private boolean waitingForConfirms=false;
     Gson gson;
 
     public House(int houseID, int housePort, int serverPort, String serverHost) throws IOException, InterruptedException{
@@ -63,12 +64,13 @@ public class House {
             }
         }
 
-        // 2 - ricevo la lista di case
+        // 2 - ricevo la lista di case e inizializzo in token thread che mi darà o meno il token iniziale
         String jsonArray = serverMessages.MessageToServer(serverMessages.AskHouseListMethod());
         House[] array = gson.fromJson(jsonArray, House[].class);
         for(int i = 0; i<array.length; i++){
             houseList.add(array[i]);
         }
+        tokenThread = new TokenThread(this);
 
         // 3 - avvio smart meter
         smartMeter = new SmartMeterSimulator(Integer.toString(id), buffer);
@@ -78,7 +80,9 @@ public class House {
 
         // 4 - mi metto in ascolto, tra subito dopo l'arrivo della lista e subito prima che mi metto in ascolto
         // qualcuno esce, lo scoprirò nel presentarmi a chi è uscito
+//        System.out.println("------- sleeping for 10 seconds. quit now with another house");
 //        Thread.sleep(10000);
+
         ServerSocket socket = new ServerSocket(port);
         houseSocket = new HouseSocketThread(socket, this);
 
@@ -87,14 +91,13 @@ public class House {
             if(h.GetID() != id) {
                 System.out.println("introducing to house " + h.GetID());
                 int attempt = 0;
-                while(attempt < 10) {
+                while(attempt < 3) {
                     try {
-//                        houseMessages.IntroduceTo(h.GetPort(), this);
                         houseMessages.SendMessage(
                                 houseMessages.IntroduceMethod()+split+gson.toJson(h)+split+gson.toJson(this)
                         );
                         break;
-                    } catch (ConnectException e) {
+                    } catch (IOException e) {               // prima era connect
                         System.out.println("Can't connect with house "+h.GetID()+". Trying again");
                         Thread.sleep(1000);
                         attempt++;
@@ -122,13 +125,15 @@ public class House {
         // di base, la prossima nell'anello per l'ultima arrivata è la casa più vecchia
         // se askOldest avviene dopo che la mia imminente next è uscita e prima che quella casa riesca a comunicarlo al server,
         // controllo se il next che mi arriva sia effettivamente tra le case in lista, se non lo è ne chiedo un altro.
+
+        System.out.println("------------- fai uscire ora la casa che sarà il mio next");
+        Thread.sleep(5000);
+
         boolean validNext = false;
         while(!validNext){
-//            System.out.println("(DEBUG) fai uscire ora la casa");
-//            Thread.sleep(5000);
-
             String nextInRingJson = serverMessages.MessageToServer(serverMessages.AskOldestMethod());
             nextInRing = gson.fromJson(nextInRingJson, House.class);
+            System.out.println("next received from server: "+nextInRing.GetID());
 
             for(House h:GetList()){
                 if(h.GetID() == nextInRing.GetID()){
@@ -142,7 +147,6 @@ public class House {
             }
         }
 
-        tokenThread = new TokenThread(this);
         tokenThread.start();
         printSituation();
     }
@@ -189,10 +193,13 @@ public class House {
         // mando la comunicazione di nuova stat prodotta alle altre case
         for(House h: GetList()) {
             if(h.GetID() != id)
-//                houseMessages.SendNewStat(h, this);
-                houseMessages.SendMessage(
-                        houseMessages.NewStatMethod()+split+gson.toJson(h)+split+gson.toJson(this)
-                );
+                try {
+                    houseMessages.SendMessage(
+                            houseMessages.NewStatMethod() + split + gson.toJson(h) + split + gson.toJson(this)
+                    );
+                } catch(ConnectException e){
+                    System.out.println("I wasn't unable to send a stat");
+                }
         }
         // lo dico anche a me stessa per triggerare la creazione della stat globale,
         // questo serve nel caso in cui io sia il coordinatore e l'ultima casa ad aver prodotto la stat
@@ -254,6 +261,7 @@ public class House {
 
     public static void main(String[] args) throws IOException, InterruptedException{
 
+//        int id = 555;
         int id = (int)(Math.random()*900+100);          // sempre 3 cifre
         int port = (int)(Math.random()*64535+1000);     // sempre 4 cifre
         House myself = new House(id, port, ServerREST.GetPort(), ServerREST.GetHost());
@@ -315,8 +323,12 @@ public class House {
         // 2 - se stavo aspettando un boost ma ancora non è iniziato, non lo voglio più
         if(tokenThread.BoostRequested()) {
             tokenThread.SetWantsBoost(false);
-            System.out.println("deleting pending boost request");
+            if(!boosting)
+                System.out.println("deleting pending boost request");
         }
+
+//        System.out.println("-------- sleeping 5 seconds");
+//        Thread.sleep(5000);
 
         // 3 - gestisco coordinatore
         if (coordinator) {
@@ -332,8 +344,8 @@ public class House {
 
         // mi serve rimuovere prima la casa dal server e poi dalle case per askNewNext
         serverMessages.MessageToServer(serverMessages.RemoveMethod()+split+id);
+
         for (House h : temp) {
-//            Thread.sleep(5000);
             int attempt = 0;
             System.out.println("telling house " + h.GetID() + " to remove me from its list");
             while(attempt<3) {
@@ -341,6 +353,8 @@ public class House {
                     houseMessages.SendMessage(
                             houseMessages.QuitMethod()+split+gson.toJson(h)+split+gson.toJson(id)
                     );
+                    if(h.GetID() != id)
+                        confirmations.put(h.GetID(), false);
                     break;
                 } catch (ConnectException e) {
                     System.out.println("House "+h.GetID()+" may have quit, retrying again...");
@@ -348,8 +362,9 @@ public class House {
                     attempt++;
                 }
             }
-            if(attempt==3)
-                System.out.println("House "+h.GetID()+" have quit, moving on");
+            if(attempt==3) {
+                System.out.println("House " + h.GetID() + " have quit, moving on");
+            }
         }
 
         WaitForConfirmations();
@@ -389,13 +404,10 @@ public class House {
     }
 
     private void WaitForConfirmations(){
-        for(House h : houseList){
-            if(h.GetID() != id)
-                confirmations.put(h.GetID(), false);
-        }
         if(confirmations.size()!=0) {
             try {
                 System.out.println("waiting for everyone to remove me from their list");
+                waitingForConfirms = true;
                 synchronized (this) {
                     wait();
                 }
@@ -423,15 +435,16 @@ public class House {
     }
 
     public void AddHouse(House h) throws IOException{
-        // controllo non ci sia già la casa in questione. può capitare se si presenta dopo che ho ricevuto
-        // una lista di case già aggiornata
-        if(staticQuitting){
+        // se mentre sto quittando e sono già in attesa di conferme arriva una nuova casa, chiedo anche a lei conferma
+        if(waitingForConfirms){
             if(!confirmations.containsKey(h.GetID())){
                 confirmations.put(h.GetID(),false);
             }
             houseMessages.SendMessage(houseMessages.QuitMethod()+split+gson.toJson(h)+split+gson.toJson(id));
         }
 
+        // controllo non ci sia già la casa in questione. può capitare se si presenta dopo che ho ricevuto
+        // una lista di case già aggiornata
         boolean alreadyPresent = false;
         for(House i:GetList()){
             if(i.GetID() == h.GetID())
@@ -532,7 +545,13 @@ public class House {
             coordinator = true;
             System.out.println("\n+++ I was elected as the new coordinator +++\n");
         } else {
-            Elect();
+            // inoltro l'elezione se sto quittando, ma solo se c'è qualcun altro oltre a chi mi sta eleggendo
+            // (e che quindi sta uscendo) e me, che sto uscendo
+            if(houseList.size() > 2)
+                Elect();
+            else{
+                System.out.println("election accepted, but I'm quitting together with the only other house left");
+            }
         }
     }
 
@@ -543,25 +562,36 @@ public class House {
     }
 
     public void Elect(){
-        // provare uscita contemporanea coordinatore e suo next
-//            Thread.sleep(10000);
-        boolean elected = false;
-        while(!elected) {
+        int attempts = 0;
+        while(attempts < 3) {
             // se sarei io quello da eleggere, allora non importa
-            if(nextInRing.GetID() == id)
+            if (nextInRing.GetID() == id) {
+                System.out.println("I'm the only house left, so I won't elect anyone");
                 break;
+            }
             try {
                 System.out.println("electing " + nextInRing.GetID() + " as the new coordinator");
                 houseMessages.SendMessage(
-                        houseMessages.ElectMethod()+split+gson.toJson(nextInRing)
+                        houseMessages.ElectMethod() + split + gson.toJson(nextInRing)
                 );
-                elected = true;
+                break;
             } catch (IOException e) {                   // prima era solo ConnectException
-                synchronized (this){
-                    System.out.println("my next quit. waiting for a new next to elect");
-                    try {
-                        wait();
-                    } catch (InterruptedException e1){e1.printStackTrace();}
+                System.out.println("can't connect with my next, retrying...");
+                attempts++;
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        if(attempts == 3 && houseList.size() > 1) {
+            synchronized (this) {
+                System.out.println("my next quit. waiting for a new next to elect");
+                try {
+                    wait();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
             }
         }

@@ -61,11 +61,11 @@ public class HouseMessages {
         switch (method){
             case TOKEN_METHOD:
 //                System.out.println("sending to "+target.GetID());
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e){
-//                    e.printStackTrace();
-//                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e){
+                    e.printStackTrace();
+                }
                 break;
             default:    // negli altri non c'è bisogno di aspettare
                 break;

@@ -113,7 +113,7 @@ public class ServerREST {
     public Response RemoveHouse(String jsonHouseID) {
         // per testare l'entrata nel ring di una casa durante l'uscita del next che gli sta venendo assegnato
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e){
             e.printStackTrace();
         }
