@@ -84,7 +84,7 @@ public class ServerREST {
     @Path("add-house")
     @POST
     @Consumes({"application/json"})
-    public synchronized Response AddHouse(String jsonHouse){
+    public Response AddHouse(String jsonHouse){
         House h = gson.fromJson(jsonHouse, House.class);
         if(houses.GetInstance().ExistingID(h.GetID())) {
             System.out.println("house "+h.GetID()+" already present");

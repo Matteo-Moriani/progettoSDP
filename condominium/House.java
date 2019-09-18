@@ -126,9 +126,6 @@ public class House {
         // se askOldest avviene dopo che la mia imminente next è uscita e prima che quella casa riesca a comunicarlo al server,
         // controllo se il next che mi arriva sia effettivamente tra le case in lista, se non lo è ne chiedo un altro.
 
-        System.out.println("------------- fai uscire ora la casa che sarà il mio next");
-        Thread.sleep(5000);
-
         boolean validNext = false;
         while(!validNext){
             String nextInRingJson = serverMessages.MessageToServer(serverMessages.AskOldestMethod());
@@ -212,7 +209,7 @@ public class House {
         return lastStat;
     }
 
-    public synchronized void NewStatFromHouse(House sendingStat) throws IOException{
+    public void NewStatFromHouse(House sendingStat) throws IOException{
         // se c'e' gia' la casa in questione, la sostituisco dalla lista mettendo la sua versione piu recente
         for(House h:housesSendingStat){
             if(h.GetID() == sendingStat.GetID()){
@@ -335,7 +332,7 @@ public class House {
             Elect();
         }
 
-        // 4 - esco dalle liste, voglio che si cancellino dalle liste una alla volta
+        // 4 - esco dalle liste
         synchronized (houseList) {
             houseList.remove(this);
         }

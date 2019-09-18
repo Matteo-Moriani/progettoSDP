@@ -148,6 +148,8 @@ public class AdminClient {
                 System.out.print("\n");
             } catch (NumberFormatException e){
                 System.out.println(FORMAT_ERROR);
+            } catch (ArrayIndexOutOfBoundsException e){
+                System.out.println(FORMAT_ERROR);
             }
         }
         System.out.println("quitting");
